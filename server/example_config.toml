@@ -1,0 +1,9 @@
+[general]
+ip = "127.0.0.1"
+port = 90009
+
+[database]
+name = "babibapp"
+user = "babibapp"
+password = "password123"
+host = "localhost"

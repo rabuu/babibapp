@@ -1,0 +1,9 @@
+[workspace]
+
+members = [
+	"server",
+	# ? "routes",
+	# TODO: "api",
+	# TODO: "clients/cli",
+	# TODO: "clients/webui",
+]
