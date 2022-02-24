@@ -21,6 +21,7 @@ pub struct DatabaseSettings {
     pub host: String,
     pub user: String,
     pub password: String,
+    pub pool_size: u32,
 }
 
 impl Settings {

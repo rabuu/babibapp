@@ -7,3 +7,4 @@ name = "babibapp"
 user = "babibapp"
 password = "password123"
 host = "localhost"
+pool_size = 5
