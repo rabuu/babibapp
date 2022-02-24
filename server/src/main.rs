@@ -4,6 +4,7 @@ use actix_web::{App, HttpServer};
 use anyhow::anyhow;
 
 use babibapp::error::BabibappError;
+use babibapp::routes;
 use babibapp::settings::Settings;
 
 #[actix_web::main]
@@ -19,7 +20,7 @@ async fn main() -> actix_web::Result<(), BabibappError> {
         settings.http.bind, settings.http.port
     );
 
-    let _ = HttpServer::new(|| App::new())
+    let _ = HttpServer::new(|| App::new().configure(|cfg| routes::routes_config(cfg)))
         .bind((settings.http.bind, settings.http.port))?
         .run()
         .await?;
