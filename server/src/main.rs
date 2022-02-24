@@ -1,18 +1,27 @@
 use std::env;
 
+use actix_web::{App, HttpServer};
 use anyhow::anyhow;
 
-use babibapp::config::Config;
+use babibapp::error::BabibappError;
+use babibapp::settings::Settings;
 
-fn main() -> anyhow::Result<()> {
+#[actix_web::main]
+async fn main() -> actix_web::Result<(), BabibappError> {
     let mut args = env::args().skip(1);
+    let settings_path = args.next().ok_or(anyhow!(
+        "Expected argument `settings_path`, but got nothing",
+    ))?;
+    let settings = Settings::from_toml(&settings_path).unwrap();
 
-    let config_path = args
-        .next()
-        .ok_or(anyhow!("Expected argument `config_path`, but got nothing"))?;
+    println!(
+        "Starting http server at {}:{}",
+        settings.http.bind, settings.http.port
+    );
 
-    let config = Config::from_toml(&config_path).unwrap();
-    println!("{:#?}", config);
-
+    let _ = HttpServer::new(|| App::new())
+        .bind((settings.http.bind, settings.http.port))?
+        .run()
+        .await?;
     Ok(())
 }

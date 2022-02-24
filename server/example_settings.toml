@@ -1,6 +1,6 @@
-[general]
-ip = "127.0.0.1"
-port = 90009
+[http]
+bind = "127.0.0.1"
+port = 59172
 
 [database]
 name = "babibapp"
