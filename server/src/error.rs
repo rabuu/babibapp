@@ -47,4 +47,4 @@ impl fmt::Display for BabibappError {
     }
 }
 
-// impl actix_web::error::ResponseError for BabibappError {}
+impl actix_web::error::ResponseError for BabibappError {}

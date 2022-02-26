@@ -1,13 +1,10 @@
 use actix_web::web;
-use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::PgConnection;
 
 use crate::error::BabibappError;
+use crate::DbPool;
 
-pub async fn blocked_access<F, T>(
-    pool: &Pool<ConnectionManager<PgConnection>>,
-    f: F,
-) -> Result<T, BabibappError>
+pub async fn blocked_access<F, T>(pool: &DbPool, f: F) -> Result<T, BabibappError>
 where
     F: FnOnce(&PgConnection) -> T + Send + 'static,
     T: Send + 'static,
@@ -20,5 +17,5 @@ where
     })
     .await?;
 
-    Ok(res)
+    res
 }

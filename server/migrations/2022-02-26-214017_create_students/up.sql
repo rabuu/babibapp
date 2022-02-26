@@ -1,7 +1,6 @@
-CREATE TABLE student (
+CREATE TABLE students (
 	id SERIAL PRIMARY KEY,
 	last_name VARCHAR(20) NOT NULL,
 	first_name VARCHAR(20) NOT NULL,
-	password_hash TEXT NOT NULL,
 	is_admin BOOLEAN DEFAULT FALSE NOT NULL
 );

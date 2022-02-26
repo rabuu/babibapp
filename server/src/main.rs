@@ -3,14 +3,16 @@ extern crate diesel_migrations;
 
 use std::env;
 
-use actix_web::{App, HttpServer};
+use actix_web::{middleware, web, App, HttpServer};
 use anyhow::anyhow;
 use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::PgConnection;
 
 use babibapp::error::BabibappError;
 use babibapp::settings::Settings;
-use babibapp::{db, routes};
+use babibapp::DbPool;
+use babibapp::{actions, db};
+use env_logger::Env;
 
 embed_migrations!();
 
@@ -22,6 +24,9 @@ async fn main() -> actix_web::Result<(), BabibappError> {
     ))?;
     let settings = Settings::from_toml(&settings_path).unwrap();
 
+    // init logging
+    env_logger::init_from_env(Env::new().default_filter_or("info"));
+
     // set up database pool
     let db_url = format!(
         "postgres://{}:{}@{}/{}",
@@ -30,27 +35,35 @@ async fn main() -> actix_web::Result<(), BabibappError> {
         settings.database.host,
         settings.database.name
     );
-    let db_manager = ConnectionManager::<PgConnection>::new(&db_url);
-    let db_pool = Pool::builder()
+    let manager = ConnectionManager::<PgConnection>::new(&db_url);
+    let pool: DbPool = Pool::builder()
         .max_size(settings.database.pool_size)
-        .build(db_manager)
+        .build(manager)
         .unwrap_or_else(|_| panic!("Error connecting to {}", db_url));
 
     // run migrations
-    db::blocked_access(&db_pool, |conn| {
+    db::blocked_access(&pool, |conn| {
         embedded_migrations::run(conn)?;
         Ok(()) as Result<(), BabibappError>
     })
     .await??;
 
-    println!(
+    log::info!(
         "Starting http server at {}:{}",
-        settings.http.bind, settings.http.port
+        settings.http.bind,
+        settings.http.port
     );
 
-    let _ = HttpServer::new(|| App::new().configure(|cfg| routes::routes_config(cfg)))
-        .bind((settings.http.bind, settings.http.port))?
-        .run()
-        .await?;
+    // start HTTP server
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(pool.clone()))
+            .wrap(middleware::Logger::default())
+            .configure(actions::config)
+    })
+    .bind((settings.http.bind, settings.http.port))?
+    .run()
+    .await?;
+
     Ok(())
 }
