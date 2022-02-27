@@ -5,8 +5,10 @@ mod student;
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/student")
-            .service(student::list_all_students)
-            .service(student::get_student_by_id)
-            .service(student::add_student),
+            .service(student::list_all)
+            .service(student::get)
+            .service(student::add)
+            .service(student::reset)
+            .service(student::delete),
     );
 }
