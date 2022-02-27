@@ -56,19 +56,20 @@ pub async fn get(pool: web::Data<DbPool>, student_id: web::Path<i32>) -> ActionR
 // POST
 //
 
-#[post("/add")]
+#[post("/register")]
 pub async fn add(
     pool: web::Data<DbPool>,
-    form: web::Json<models::student::NewStudent>,
+    form: web::Json<models::student::RegisterStudent>,
 ) -> ActionResult {
     let student = db::blocked_access(&pool, move |conn| {
         use schema::students::dsl::*;
 
         let new_student = models::student::NewStudent {
             email: form.email.clone(),
-            password_hash: form.password_hash.clone(),
+            // TODO: Implement hashing
             first_name: form.first_name.clone(),
             last_name: form.last_name.clone(),
+            password_hash: form.password.clone(),
             is_admin: form.is_admin,
         };
 
