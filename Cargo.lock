@@ -251,12 +251,30 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "anyhow",
+ "babibapp_models",
+ "babibapp_schema",
  "diesel",
  "diesel_migrations",
  "env_logger",
  "log",
  "serde",
  "toml",
+]
+
+[[package]]
+name = "babibapp_models"
+version = "0.1.0"
+dependencies = [
+ "babibapp_schema",
+ "diesel",
+ "serde",
+]
+
+[[package]]
+name = "babibapp_schema"
+version = "0.1.0"
+dependencies = [
+ "diesel",
 ]
 
 [[package]]

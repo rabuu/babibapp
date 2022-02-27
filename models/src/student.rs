@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::schema::students;
+use babibapp_schema::schema::students;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 pub struct Student {
