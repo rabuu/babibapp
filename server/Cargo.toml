@@ -16,3 +16,5 @@ diesel = { version = "1.4", features = ["postgres", "r2d2"] }
 diesel_migrations = "1.4"
 log = "0.4"
 env_logger = "0.9"
+chrono = "0.4"
+jsonwebtoken = "8.0"

@@ -4,7 +4,7 @@ use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl};
 use babibapp_models as models;
 use babibapp_schema::schema;
 
-use super::ActionResult;
+use super::{ActionResult, ActionTokenQuery};
 use crate::db;
 use crate::error::BabibappError;
 use crate::DbPool;
@@ -14,7 +14,10 @@ use crate::DbPool;
 //
 
 #[get("/list_all")]
-async fn list_all(pool: web::Data<DbPool>) -> ActionResult {
+async fn list_all(pool: web::Data<DbPool>, token: web::Query<ActionTokenQuery>) -> ActionResult {
+    let token = token.into_inner();
+    let _claims = token.validate()?;
+
     let students = db::blocked_access(&pool, |conn| {
         use schema::students::table;
         let list = table.load::<models::student::Student>(conn)?;
