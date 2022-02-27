@@ -1,6 +1,8 @@
 CREATE TABLE students (
 	id SERIAL PRIMARY KEY,
-	last_name VARCHAR(20) NOT NULL,
+	email TEXT UNIQUE NOT NULL,
+	password_hash TEXT NOT NULL,
 	first_name VARCHAR(20) NOT NULL,
+	last_name VARCHAR(20) NOT NULL,
 	is_admin BOOLEAN DEFAULT FALSE NOT NULL
 );

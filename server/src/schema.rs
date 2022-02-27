@@ -1,8 +1,10 @@
 table! {
     students (id) {
         id -> Int4,
-        last_name -> Varchar,
+        email -> Text,
+        password_hash -> Text,
         first_name -> Varchar,
+        last_name -> Varchar,
         is_admin -> Bool,
     }
 }

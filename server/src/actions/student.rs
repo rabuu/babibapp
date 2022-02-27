@@ -60,16 +60,18 @@ pub async fn add(pool: web::Data<DbPool>, form: web::Json<models::NewStudent>) -
         use crate::schema::students::dsl::*;
 
         let new_student = models::NewStudent {
+            email: form.email.clone(),
+            password_hash: form.password_hash.clone(),
             first_name: form.first_name.clone(),
             last_name: form.last_name.clone(),
+            is_admin: form.is_admin.clone(),
         };
 
         diesel::insert_into(students)
             .values(&new_student)
             .get_result(conn)
-            .unwrap()
     })
-    .await?;
+    .await??;
 
     log::debug!("Database response: {:?}", student);
 
