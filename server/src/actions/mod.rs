@@ -1,6 +1,16 @@
-use actix_web::web;
+use actix_web::{web, HttpResponse};
+use serde::Deserialize;
+
+use crate::error::BabibappError;
 
 mod student;
+
+type ActionResult = Result<HttpResponse, BabibappError>;
+
+#[derive(Debug, Deserialize)]
+struct ActionTokenQuery {
+    token: String,
+}
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(

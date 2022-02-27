@@ -4,18 +4,17 @@ use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl};
 use babibapp_models as models;
 use babibapp_schema::schema;
 
+use super::ActionResult;
 use crate::db;
 use crate::error::BabibappError;
 use crate::DbPool;
-
-type ActionResult = Result<HttpResponse, BabibappError>;
 
 //
 // GET
 //
 
 #[get("/list_all")]
-pub async fn list_all(pool: web::Data<DbPool>) -> ActionResult {
+async fn list_all(pool: web::Data<DbPool>) -> ActionResult {
     let students = db::blocked_access(&pool, |conn| {
         use schema::students::table;
         let list = table.load::<models::student::Student>(conn)?;
@@ -29,7 +28,7 @@ pub async fn list_all(pool: web::Data<DbPool>) -> ActionResult {
 }
 
 #[get("/{student_id}")]
-pub async fn get(pool: web::Data<DbPool>, student_id: web::Path<i32>) -> ActionResult {
+async fn get(pool: web::Data<DbPool>, student_id: web::Path<i32>) -> ActionResult {
     let student_id = student_id.into_inner();
 
     let student = db::blocked_access(&pool, move |conn| {
@@ -57,7 +56,7 @@ pub async fn get(pool: web::Data<DbPool>, student_id: web::Path<i32>) -> ActionR
 //
 
 #[post("/register")]
-pub async fn add(
+async fn add(
     pool: web::Data<DbPool>,
     form: web::Json<models::student::RegisterStudent>,
 ) -> ActionResult {
@@ -89,7 +88,7 @@ pub async fn add(
 //
 
 #[put("/reset/{student_id}")]
-pub async fn reset(
+async fn reset(
     pool: web::Data<DbPool>,
     student_id: web::Path<i32>,
     form: web::Json<models::student::NewStudent>,
@@ -124,7 +123,7 @@ pub async fn reset(
 //
 
 #[delete("/{student_id}")]
-pub async fn delete(pool: web::Data<DbPool>, student_id: web::Path<i32>) -> ActionResult {
+async fn delete(pool: web::Data<DbPool>, student_id: web::Path<i32>) -> ActionResult {
     let student_id = student_id.into_inner();
 
     let student = db::blocked_access(&pool, move |conn| {
