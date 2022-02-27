@@ -1,6 +1,13 @@
 use std::fmt;
 
+use actix_web::{http::StatusCode, HttpResponse};
 use anyhow::anyhow;
+use serde::Serialize;
+
+#[derive(Serialize)]
+struct ApiError {
+    error: &'static str,
+}
 
 pub struct BabibappError {
     pub msg: Option<&'static str>,
@@ -47,4 +54,21 @@ impl fmt::Display for BabibappError {
     }
 }
 
-impl actix_web::error::ResponseError for BabibappError {}
+impl actix_web::error::ResponseError for BabibappError {
+    fn status_code(&self) -> actix_web::http::StatusCode {
+        match self.inner.downcast_ref::<diesel::result::Error>() {
+            Some(diesel::result::Error::NotFound) => StatusCode::NOT_FOUND,
+            _ => StatusCode::BAD_REQUEST,
+        }
+    }
+
+    fn error_response(&self) -> HttpResponse<actix_web::body::BoxBody> {
+        if let Some(msg) = &self.msg {
+            HttpResponse::build(self.status_code()).json(ApiError { error: msg })
+        } else {
+            HttpResponse::build(self.status_code())
+                .content_type("text/plain")
+                .body(self.inner.to_string())
+        }
+    }
+}
