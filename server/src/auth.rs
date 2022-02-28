@@ -6,10 +6,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::BabibappError;
 
-// TODO: Move to settings
-const JWT_EXPIRATION_HOURS: i64 = 24;
-const SECRET: &str = "SECRET";
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
     pub student: Student,
@@ -17,28 +13,42 @@ pub struct Claims {
 }
 
 impl Claims {
-    pub fn new(student: Student) -> Self {
+    pub fn new(student: Student, expiration_hours: i64) -> Self {
         Claims {
             student,
-            exp: (Utc::now() + Duration::hours(JWT_EXPIRATION_HOURS)).timestamp(),
+            exp: (Utc::now() + Duration::hours(expiration_hours)).timestamp(),
+        }
+    }
+
+    pub fn root(expiration_minutes: i64) -> Self {
+        Claims {
+            student: Student {
+                id: 0,
+                email: "ROOT".to_string(),
+                first_name: "ROOT".to_string(),
+                last_name: "ROOT".to_string(),
+                password_hash: "ROOT".to_string(),
+                is_admin: true,
+            },
+            exp: (Utc::now() + Duration::minutes(expiration_minutes)).timestamp(),
         }
     }
 }
 
-pub fn create_jwt(claims: Claims) -> Result<String, BabibappError> {
-    let encoding_key = EncodingKey::from_secret(SECRET.as_bytes());
+pub fn create_jwt(claims: Claims, secret: String) -> Result<String, BabibappError> {
+    let encoding_key = EncodingKey::from_secret(secret.as_bytes());
     jsonwebtoken::encode(&Header::default(), &claims, &encoding_key).map_err(|e| e.into())
 }
 
-pub fn decode_jwt(token: &str) -> Result<Claims, BabibappError> {
-    let decoding_key = DecodingKey::from_secret(SECRET.as_bytes());
+pub fn decode_jwt(token: &str, secret: String) -> Result<Claims, BabibappError> {
+    let decoding_key = DecodingKey::from_secret(secret.as_bytes());
     jsonwebtoken::decode::<Claims>(token, &decoding_key, &Validation::default())
         .map(|data| data.claims)
         .map_err(|e| e.into())
 }
 
-pub fn validate_token(token: &str) -> Result<Claims, BabibappError> {
-    let claims = decode_jwt(token)?;
+pub fn validate_token(token: &str, secret: String) -> Result<Claims, BabibappError> {
+    let claims = decode_jwt(token, secret)?;
     if claims.exp < Utc::now().timestamp() {
         return Err(BabibappError::from_msg("Token expired!"));
     }
@@ -57,8 +67,8 @@ impl TokenWrapper {
         }
     }
 
-    pub fn from_claims(claims: Claims) -> Result<Self, BabibappError> {
-        let jwt = create_jwt(claims)?;
+    pub fn from_claims(claims: Claims, secret: String) -> Result<Self, BabibappError> {
+        let jwt = create_jwt(claims, secret)?;
         Ok(Self::from_jwt(&jwt))
     }
 
@@ -73,7 +83,7 @@ impl TokenWrapper {
         Ok(wrapped)
     }
 
-    pub fn validate(&self) -> Result<Claims, BabibappError> {
-        validate_token(&self.token)
+    pub fn validate(&self, secret: String) -> Result<Claims, BabibappError> {
+        validate_token(&self.token, secret)
     }
 }

@@ -8,3 +8,12 @@ user = "babibapp"
 password = "password123"
 host = "localhost"
 pool_size = 5
+
+[token]
+secret = "SECRET"
+expiration_hours = 24
+
+[root]
+email = "root@root"
+password = "toor"
+expiration_minutes = 30

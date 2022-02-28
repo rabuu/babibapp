@@ -9,6 +9,7 @@ use super::ActionResult;
 use crate::auth;
 use crate::db;
 use crate::error::BabibappError;
+use crate::settings::Settings;
 use crate::DbPool;
 
 //
@@ -16,9 +17,15 @@ use crate::DbPool;
 //
 
 #[get("/list_all")]
-async fn list_all(pool: web::Data<DbPool>, req: HttpRequest) -> ActionResult {
-    let token = auth::TokenWrapper::from_request(req)?;
-    let claims = token.validate()?;
+async fn list_all(
+    pool: web::Data<DbPool>,
+    settings: web::Data<Settings>,
+    req: HttpRequest,
+) -> ActionResult {
+    let token_settings = &settings.token;
+
+    let token = auth::TokenWrapper::from_request(req.clone())?;
+    let claims = token.validate(token_settings.secret.clone())?;
 
     if !claims.student.is_admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
@@ -39,11 +46,14 @@ async fn list_all(pool: web::Data<DbPool>, req: HttpRequest) -> ActionResult {
 #[get("/{student_id}")]
 async fn get(
     pool: web::Data<DbPool>,
+    settings: web::Data<Settings>,
     student_id: web::Path<i32>,
     req: HttpRequest,
 ) -> ActionResult {
-    let token = auth::TokenWrapper::from_request(req)?;
-    let claims = token.validate()?;
+    let token_settings = &settings.token;
+
+    let token = auth::TokenWrapper::from_request(req.clone())?;
+    let claims = token.validate(token_settings.secret.clone())?;
 
     if !claims.student.is_admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
@@ -78,11 +88,14 @@ async fn get(
 #[post("/add")]
 async fn add(
     pool: web::Data<DbPool>,
+    settings: web::Data<Settings>,
     form: web::Json<models::student::RegisterStudent>,
     req: HttpRequest,
 ) -> ActionResult {
-    let token = auth::TokenWrapper::from_request(req)?;
-    let claims = token.validate()?;
+    let token_settings = &settings.token;
+
+    let token = auth::TokenWrapper::from_request(req.clone())?;
+    let claims = token.validate(token_settings.secret.clone())?;
 
     if !claims.student.is_admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
@@ -119,11 +132,14 @@ async fn add(
 #[delete("/{student_id}")]
 async fn delete(
     pool: web::Data<DbPool>,
+    settings: web::Data<Settings>,
     student_id: web::Path<i32>,
     req: HttpRequest,
 ) -> ActionResult {
-    let token = auth::TokenWrapper::from_request(req)?;
-    let claims = token.validate()?;
+    let token_settings = &settings.token;
+
+    let token = auth::TokenWrapper::from_request(req.clone())?;
+    let claims = token.validate(token_settings.secret.clone())?;
 
     if !claims.student.is_admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));

@@ -3,25 +3,40 @@ use std::{fs, net::IpAddr};
 use anyhow::Context;
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Settings {
-    pub http: HttpConfig,
+    pub http: HttpSettings,
     pub database: DatabaseSettings,
+    pub token: TokenSettings,
+    pub root: RootSettings,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct HttpConfig {
+#[derive(Debug, Deserialize, Clone)]
+pub struct HttpSettings {
     pub bind: IpAddr,
     pub port: u16,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct DatabaseSettings {
     pub name: String,
     pub host: String,
     pub user: String,
     pub password: String,
     pub pool_size: u32,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct TokenSettings {
+    pub secret: String,
+    pub expiration_hours: i64,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct RootSettings {
+    pub email: String,
+    pub password: String,
+    pub expiration_minutes: i64,
 }
 
 impl Settings {

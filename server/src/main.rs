@@ -54,10 +54,13 @@ async fn main() -> actix_web::Result<(), BabibappError> {
         settings.http.port
     );
 
+    let settings_app_data = settings.clone();
+
     // start HTTP server
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(settings_app_data.clone()))
             .wrap(middleware::Logger::default())
             .configure(request::config)
     })
