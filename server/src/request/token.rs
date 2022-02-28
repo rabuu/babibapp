@@ -1,5 +1,4 @@
-use actix_web::{post, web};
-use actix_web::{HttpRequest, HttpResponse};
+use actix_web::{post, web, HttpResponse};
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl};
 
 use babibapp_models as models;
