@@ -4,7 +4,8 @@ use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl};
 use babibapp_models as models;
 use babibapp_schema::schema;
 
-use super::{ActionResult, ActionTokenQuery};
+use super::ActionResult;
+use crate::auth::TokenWrapper;
 use crate::db;
 use crate::error::BabibappError;
 use crate::DbPool;
@@ -14,7 +15,7 @@ use crate::DbPool;
 //
 
 #[get("/list_all")]
-async fn list_all(pool: web::Data<DbPool>, token: web::Query<ActionTokenQuery>) -> ActionResult {
+async fn list_all(pool: web::Data<DbPool>, token: web::Json<TokenWrapper>) -> ActionResult {
     let token = token.into_inner();
     let _claims = token.validate()?;
 

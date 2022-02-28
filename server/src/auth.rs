@@ -42,3 +42,14 @@ pub fn validate_token(token: &str) -> Result<Claims, BabibappError> {
     }
     Ok(claims)
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TokenWrapper {
+    pub token: String,
+}
+
+impl TokenWrapper {
+    pub fn validate(&self) -> Result<Claims, BabibappError> {
+        validate_token(&self.token)
+    }
+}

@@ -1,23 +1,11 @@
 use actix_web::{web, HttpResponse};
-use serde::Deserialize;
 
-use crate::auth;
 use crate::error::BabibappError;
 
+mod login;
 mod student;
 
 type ActionResult = Result<HttpResponse, BabibappError>;
-
-#[derive(Debug, Deserialize)]
-struct ActionTokenQuery {
-    token: String,
-}
-
-impl ActionTokenQuery {
-    pub fn validate(&self) -> Result<auth::Claims, BabibappError> {
-        auth::validate_token(&self.token)
-    }
-}
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -27,5 +15,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(student::add)
             .service(student::reset)
             .service(student::delete),
-    );
+    )
+    .service(web::scope("/login").service(login::generate_token));
 }
