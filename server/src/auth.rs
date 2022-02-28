@@ -1,3 +1,5 @@
+use actix_web::HttpRequest;
+use babibapp_models::student::Student;
 use chrono::{Duration, Utc};
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
@@ -10,14 +12,14 @@ const SECRET: &str = "SECRET";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    email: String,
+    pub student: Student,
     exp: i64,
 }
 
 impl Claims {
-    pub fn new(email: String) -> Self {
+    pub fn new(student: Student) -> Self {
         Claims {
-            email,
+            student,
             exp: (Utc::now() + Duration::hours(JWT_EXPIRATION_HOURS)).timestamp(),
         }
     }
@@ -49,6 +51,28 @@ pub struct TokenWrapper {
 }
 
 impl TokenWrapper {
+    pub fn from_jwt(jwt: &str) -> Self {
+        TokenWrapper {
+            token: jwt.to_string(),
+        }
+    }
+
+    pub fn from_claims(claims: Claims) -> Result<Self, BabibappError> {
+        let jwt = create_jwt(claims)?;
+        Ok(Self::from_jwt(&jwt))
+    }
+
+    pub fn from_request(req: HttpRequest) -> Result<Self, BabibappError> {
+        let auth_header = req
+            .headers()
+            .get(actix_web::http::header::AUTHORIZATION)
+            .ok_or(anyhow::anyhow!("No authorization header"))?
+            .to_str()?;
+
+        let wrapped = Self::from_jwt(auth_header);
+        Ok(wrapped)
+    }
+
     pub fn validate(&self) -> Result<Claims, BabibappError> {
         validate_token(&self.token)
     }

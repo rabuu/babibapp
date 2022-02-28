@@ -1,11 +1,11 @@
-use actix_web::{delete, get, post, put, web, HttpResponse};
+use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse};
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl};
 
 use babibapp_models as models;
 use babibapp_schema::schema;
 
 use super::ActionResult;
-use crate::auth::TokenWrapper;
+use crate::auth;
 use crate::db;
 use crate::error::BabibappError;
 use crate::DbPool;
@@ -15,9 +15,13 @@ use crate::DbPool;
 //
 
 #[get("/list_all")]
-async fn list_all(pool: web::Data<DbPool>, token: web::Json<TokenWrapper>) -> ActionResult {
-    let token = token.into_inner();
-    let _claims = token.validate()?;
+async fn list_all(pool: web::Data<DbPool>, req: HttpRequest) -> ActionResult {
+    let token = auth::TokenWrapper::from_request(req)?;
+    let claims = token.validate()?;
+
+    if !claims.student.is_admin {
+        return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
+    }
 
     let students = db::blocked_access(&pool, |conn| {
         use schema::students::table;
@@ -32,7 +36,18 @@ async fn list_all(pool: web::Data<DbPool>, token: web::Json<TokenWrapper>) -> Ac
 }
 
 #[get("/{student_id}")]
-async fn get(pool: web::Data<DbPool>, student_id: web::Path<i32>) -> ActionResult {
+async fn get(
+    pool: web::Data<DbPool>,
+    student_id: web::Path<i32>,
+    req: HttpRequest,
+) -> ActionResult {
+    let token = auth::TokenWrapper::from_request(req)?;
+    let claims = token.validate()?;
+
+    if !claims.student.is_admin {
+        return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
+    }
+
     let student_id = student_id.into_inner();
 
     let student = db::blocked_access(&pool, move |conn| {
@@ -63,7 +78,15 @@ async fn get(pool: web::Data<DbPool>, student_id: web::Path<i32>) -> ActionResul
 async fn add(
     pool: web::Data<DbPool>,
     form: web::Json<models::student::RegisterStudent>,
+    req: HttpRequest,
 ) -> ActionResult {
+    let token = auth::TokenWrapper::from_request(req)?;
+    let claims = token.validate()?;
+
+    if !claims.student.is_admin {
+        return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
+    }
+
     let student = db::blocked_access(&pool, move |conn| {
         use schema::students::dsl::*;
 
@@ -96,7 +119,15 @@ async fn reset(
     pool: web::Data<DbPool>,
     student_id: web::Path<i32>,
     form: web::Json<models::student::NewStudent>,
+    req: HttpRequest,
 ) -> ActionResult {
+    let token = auth::TokenWrapper::from_request(req)?;
+    let claims = token.validate()?;
+
+    if !claims.student.is_admin {
+        return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
+    }
+
     let student_id = student_id.into_inner();
 
     let student = db::blocked_access(&pool, move |conn| {
@@ -127,7 +158,18 @@ async fn reset(
 //
 
 #[delete("/{student_id}")]
-async fn delete(pool: web::Data<DbPool>, student_id: web::Path<i32>) -> ActionResult {
+async fn delete(
+    pool: web::Data<DbPool>,
+    student_id: web::Path<i32>,
+    req: HttpRequest,
+) -> ActionResult {
+    let token = auth::TokenWrapper::from_request(req)?;
+    let claims = token.validate()?;
+
+    if !claims.student.is_admin {
+        return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
+    }
+
     let student_id = student_id.into_inner();
 
     let student = db::blocked_access(&pool, move |conn| {
