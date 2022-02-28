@@ -1,5 +1,5 @@
 use actix_web::HttpResponse;
-use actix_web::{post, web};
+use actix_web::{get, post, web};
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl};
 
 use babibapp_models as models;
@@ -11,8 +11,8 @@ use crate::DbPool;
 
 use super::ActionResult;
 
-#[post("/token")]
-async fn generate_token(
+#[post("/generate")]
+async fn generate(
     pool: web::Data<DbPool>,
     form: web::Json<models::student::LoginStudent>,
 ) -> ActionResult {
@@ -45,4 +45,12 @@ async fn generate_token(
     } else {
         Ok(HttpResponse::NotFound().body(format!("No student found with email: {}", login_email)))
     }
+}
+
+#[get("/validate")]
+async fn validate(token: web::Json<TokenWrapper>) -> ActionResult {
+    let token = token.into_inner();
+    token.validate()?;
+
+    Ok(HttpResponse::Ok().body("Valid token"))
 }

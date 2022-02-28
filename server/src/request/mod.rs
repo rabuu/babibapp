@@ -2,8 +2,8 @@ use actix_web::{web, HttpResponse};
 
 use crate::error::BabibappError;
 
-mod login;
 mod student;
+mod token;
 
 type ActionResult = Result<HttpResponse, BabibappError>;
 
@@ -16,5 +16,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(student::reset)
             .service(student::delete),
     )
-    .service(web::scope("/login").service(login::generate_token));
+    .service(
+        web::scope("/token")
+            .service(token::generate)
+            .service(token::validate),
+    );
 }

@@ -11,7 +11,7 @@ use diesel::PgConnection;
 use babibapp::error::BabibappError;
 use babibapp::settings::Settings;
 use babibapp::DbPool;
-use babibapp::{actions, db};
+use babibapp::{db, request};
 use env_logger::Env;
 
 embed_migrations!();
@@ -59,7 +59,7 @@ async fn main() -> actix_web::Result<(), BabibappError> {
         App::new()
             .app_data(web::Data::new(pool.clone()))
             .wrap(middleware::Logger::default())
-            .configure(actions::config)
+            .configure(request::config)
     })
     .bind((settings.http.bind, settings.http.port))?
     .run()
