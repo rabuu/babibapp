@@ -9,7 +9,7 @@ pub struct Student {
     pub first_name: String,
     pub last_name: String,
     pub password_hash: String,
-    pub is_admin: bool,
+    pub admin: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -19,7 +19,7 @@ pub struct NewStudent {
     pub first_name: String,
     pub last_name: String,
     pub password_hash: String,
-    pub is_admin: Option<bool>,
+    pub admin: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -28,7 +28,7 @@ pub struct RegisterStudent {
     pub first_name: String,
     pub last_name: String,
     pub password: String,
-    pub is_admin: Option<bool>,
+    pub admin: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

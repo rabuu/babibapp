@@ -24,7 +24,7 @@ table! {
         first_name -> Varchar,
         last_name -> Varchar,
         password_hash -> Text,
-        is_admin -> Bool,
+        admin -> Bool,
     }
 }
 

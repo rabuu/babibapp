@@ -27,7 +27,7 @@ async fn list_all(
     let token = auth::TokenWrapper::from_request(req.clone())?;
     let claims = token.validate(token_settings.secret.clone())?;
 
-    if !claims.student.is_admin {
+    if !claims.student.admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
     }
 
@@ -55,7 +55,7 @@ async fn get(
     let token = auth::TokenWrapper::from_request(req.clone())?;
     let claims = token.validate(token_settings.secret.clone())?;
 
-    if !claims.student.is_admin {
+    if !claims.student.admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
     }
 
@@ -97,7 +97,7 @@ async fn add(
     let token = auth::TokenWrapper::from_request(req.clone())?;
     let claims = token.validate(token_settings.secret.clone())?;
 
-    if !claims.student.is_admin {
+    if !claims.student.admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
     }
 
@@ -111,7 +111,7 @@ async fn add(
             first_name: form.first_name.clone(),
             last_name: form.last_name.clone(),
             password_hash: hashed_password,
-            is_admin: form.is_admin,
+            admin: form.admin,
         };
 
         diesel::insert_into(students)
@@ -141,7 +141,7 @@ async fn delete(
     let token = auth::TokenWrapper::from_request(req.clone())?;
     let claims = token.validate(token_settings.secret.clone())?;
 
-    if !claims.student.is_admin {
+    if !claims.student.admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
     }
 

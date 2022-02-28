@@ -28,7 +28,7 @@ impl Claims {
                 first_name: "ROOT".to_string(),
                 last_name: "ROOT".to_string(),
                 password_hash: "ROOT".to_string(),
-                is_admin: true,
+                admin: true,
             },
             exp: (Utc::now() + Duration::minutes(expiration_minutes)).timestamp(),
         }
