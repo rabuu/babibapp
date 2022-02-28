@@ -4,6 +4,7 @@ use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl};
 
 use babibapp_models as models;
 use babibapp_schema::schema;
+use pwhash::bcrypt;
 
 use crate::auth;
 use crate::db;
@@ -31,7 +32,7 @@ async fn generate(
     .await??;
 
     if let Some(student) = student {
-        if student.password_hash == login_password {
+        if bcrypt::verify(&login_password, &student.password_hash) {
             let claims = auth::Claims::new(student);
             Ok(HttpResponse::Ok().json(auth::TokenWrapper::from_claims(claims)?))
         } else {

@@ -13,7 +13,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(student::list_all)
             .service(student::get)
             .service(student::add)
-            .service(student::reset)
             .service(student::delete),
     )
     .service(

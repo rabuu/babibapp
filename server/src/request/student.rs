@@ -1,8 +1,9 @@
-use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse};
-use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl};
+use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use diesel::prelude::*;
 
 use babibapp_models as models;
 use babibapp_schema::schema;
+use pwhash::bcrypt;
 
 use super::ActionResult;
 use crate::auth;
@@ -74,7 +75,7 @@ async fn get(
 // POST
 //
 
-#[post("/register")]
+#[post("/add")]
 async fn add(
     pool: web::Data<DbPool>,
     form: web::Json<models::student::RegisterStudent>,
@@ -87,15 +88,16 @@ async fn add(
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
     }
 
+    let hashed_password = bcrypt::hash(form.password.clone())?;
+
     let student = db::blocked_access(&pool, move |conn| {
         use schema::students::dsl::*;
 
         let new_student = models::student::NewStudent {
             email: form.email.clone(),
-            // TODO: Implement hashing
             first_name: form.first_name.clone(),
             last_name: form.last_name.clone(),
-            password_hash: form.password.clone(),
+            password_hash: hashed_password,
             is_admin: form.is_admin,
         };
 
@@ -108,49 +110,6 @@ async fn add(
     log::debug!("Database response: {:?}", student);
 
     Ok(HttpResponse::Ok().json(student))
-}
-
-//
-// PUT
-//
-
-#[put("/reset/{student_id}")]
-async fn reset(
-    pool: web::Data<DbPool>,
-    student_id: web::Path<i32>,
-    form: web::Json<models::student::NewStudent>,
-    req: HttpRequest,
-) -> ActionResult {
-    let token = auth::TokenWrapper::from_request(req)?;
-    let claims = token.validate()?;
-
-    if !claims.student.is_admin {
-        return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
-    }
-
-    let student_id = student_id.into_inner();
-
-    let student = db::blocked_access(&pool, move |conn| {
-        use schema::students::dsl::*;
-
-        diesel::update(students.find(student_id))
-            .set((
-                first_name.eq(form.first_name.clone()),
-                last_name.eq(form.last_name.clone()),
-            ))
-            .get_result::<models::student::Student>(conn)
-            .optional()
-    })
-    .await??;
-
-    log::debug!("Database response: {:?}", student);
-
-    if let Some(student) = student {
-        Ok(HttpResponse::Ok().json(student))
-    } else {
-        Ok(HttpResponse::NotFound()
-            .body(format!("No student found with student_id: {}", student_id)))
-    }
 }
 
 //
