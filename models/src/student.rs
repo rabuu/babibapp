@@ -22,7 +22,7 @@ pub struct NewStudent {
     pub admin: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RegisterStudent {
     pub email: String,
     pub first_name: String,
@@ -31,8 +31,22 @@ pub struct RegisterStudent {
     pub admin: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LoginStudent {
     pub email: String,
     pub password: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LimitedViewStudent {
+    pub id: i32,
+    pub first_name: String,
+    pub last_name: String,
+    // should admin be added?
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum StudentView {
+    Limited(LimitedViewStudent),
+    Full(Student),
 }

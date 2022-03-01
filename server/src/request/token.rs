@@ -44,7 +44,8 @@ async fn generate(
 
     if let Some(student) = student {
         if bcrypt::verify(&login_password, &student.password_hash) {
-            let claims = auth::Claims::new(student, token_settings.expiration_hours);
+            let claims =
+                auth::Claims::new(student.id, student.admin, token_settings.expiration_hours);
             Ok(HttpResponse::Ok().json(auth::TokenWrapper::from_claims(
                 claims,
                 token_settings.secret.clone(),

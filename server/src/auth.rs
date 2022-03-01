@@ -1,5 +1,4 @@
 use actix_web::HttpRequest;
-use babibapp_models::student::Student;
 use chrono::{Duration, Utc};
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
@@ -8,28 +7,24 @@ use crate::error::BabibappError;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    pub student: Student,
+    pub id: i32,
+    pub admin: bool,
     exp: i64,
 }
 
 impl Claims {
-    pub fn new(student: Student, expiration_hours: i64) -> Self {
+    pub fn new(id: i32, admin: bool, expiration_hours: i64) -> Self {
         Claims {
-            student,
+            id,
+            admin,
             exp: (Utc::now() + Duration::hours(expiration_hours)).timestamp(),
         }
     }
 
     pub fn root(expiration_minutes: i64) -> Self {
         Claims {
-            student: Student {
-                id: 0,
-                email: "ROOT".to_string(),
-                first_name: "ROOT".to_string(),
-                last_name: "ROOT".to_string(),
-                password_hash: "ROOT".to_string(),
-                admin: true,
-            },
+            id: 0,
+            admin: true,
             exp: (Utc::now() + Duration::minutes(expiration_minutes)).timestamp(),
         }
     }
@@ -84,6 +79,6 @@ impl TokenWrapper {
     }
 
     pub fn validate(&self, secret: String) -> Result<Claims, BabibappError> {
-        validate_token(&self.token, secret)
+        validate_token(&self.token, secret).map_err(|_| anyhow::anyhow!("Invalid token").into())
     }
 }

@@ -16,20 +16,12 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .service(delete);
 }
 
-//
-// GET
-//
-
 #[get("/get_all")]
 async fn get_all(context: web::Data<RequestContext>, req: HttpRequest) -> RequestResult {
     let token_settings = &context.settings.token;
 
     let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
-
-    if !claims.student.admin {
-        return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
-    }
+    let _ = token.validate(token_settings.secret.clone())?;
 
     let teachers = db::blocked_access(&context.pool, |conn| {
         use schema::teachers::table;
@@ -43,7 +35,7 @@ async fn get_all(context: web::Data<RequestContext>, req: HttpRequest) -> Reques
     Ok(HttpResponse::Ok().json(teachers))
 }
 
-#[get("/{teacher_id}")]
+#[get("/get/{teacher_id}")]
 async fn get(
     context: web::Data<RequestContext>,
     req: HttpRequest,
@@ -52,11 +44,7 @@ async fn get(
     let token_settings = &context.settings.token;
 
     let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
-
-    if !claims.student.admin {
-        return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
-    }
+    let _ = token.validate(token_settings.secret.clone())?;
 
     let teacher_id = teacher_id.into_inner();
 
@@ -80,10 +68,6 @@ async fn get(
     }
 }
 
-//
-// POST
-//
-
 #[post("/add")]
 async fn add(
     context: web::Data<RequestContext>,
@@ -95,7 +79,7 @@ async fn add(
     let token = auth::TokenWrapper::from_request(req.clone())?;
     let claims = token.validate(token_settings.secret.clone())?;
 
-    if !claims.student.admin {
+    if !claims.admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
     }
 
@@ -118,11 +102,7 @@ async fn add(
     Ok(HttpResponse::Ok().json(teacher))
 }
 
-//
-// DELETE
-//
-
-#[delete("/{teacher_id}")]
+#[delete("/delete/{teacher_id}")]
 async fn delete(
     context: web::Data<RequestContext>,
     req: HttpRequest,
@@ -133,7 +113,7 @@ async fn delete(
     let token = auth::TokenWrapper::from_request(req.clone())?;
     let claims = token.validate(token_settings.secret.clone())?;
 
-    if !claims.student.admin {
+    if !claims.admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
     }
 
