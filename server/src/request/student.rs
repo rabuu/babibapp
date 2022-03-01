@@ -5,12 +5,10 @@ use babibapp_models as models;
 use babibapp_schema::schema;
 use pwhash::bcrypt;
 
-use super::ActionResult;
 use crate::auth;
 use crate::db;
 use crate::error::BabibappError;
-use crate::settings::Settings;
-use crate::DbPool;
+use crate::request::{RequestContext, RequestResult};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(list_all)
@@ -24,12 +22,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 //
 
 #[get("/list_all")]
-async fn list_all(
-    pool: web::Data<DbPool>,
-    settings: web::Data<Settings>,
-    req: HttpRequest,
-) -> ActionResult {
-    let token_settings = &settings.token;
+async fn list_all(context: web::Data<RequestContext>, req: HttpRequest) -> RequestResult {
+    let token_settings = &context.settings.token;
 
     let token = auth::TokenWrapper::from_request(req.clone())?;
     let claims = token.validate(token_settings.secret.clone())?;
@@ -38,7 +32,7 @@ async fn list_all(
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
     }
 
-    let students = db::blocked_access(&pool, |conn| {
+    let students = db::blocked_access(&context.pool, |conn| {
         use schema::students::table;
         let list = table.load::<models::student::Student>(conn)?;
         Ok(list) as Result<Vec<models::student::Student>, BabibappError>
@@ -52,12 +46,11 @@ async fn list_all(
 
 #[get("/{student_id}")]
 async fn get(
-    pool: web::Data<DbPool>,
-    settings: web::Data<Settings>,
-    student_id: web::Path<i32>,
+    context: web::Data<RequestContext>,
     req: HttpRequest,
-) -> ActionResult {
-    let token_settings = &settings.token;
+    student_id: web::Path<i32>,
+) -> RequestResult {
+    let token_settings = &context.settings.token;
 
     let token = auth::TokenWrapper::from_request(req.clone())?;
     let claims = token.validate(token_settings.secret.clone())?;
@@ -68,7 +61,7 @@ async fn get(
 
     let student_id = student_id.into_inner();
 
-    let student = db::blocked_access(&pool, move |conn| {
+    let student = db::blocked_access(&context.pool, move |conn| {
         use schema::students::dsl::*;
 
         students
@@ -94,12 +87,11 @@ async fn get(
 
 #[post("/add")]
 async fn add(
-    pool: web::Data<DbPool>,
-    settings: web::Data<Settings>,
-    form: web::Json<models::student::RegisterStudent>,
+    context: web::Data<RequestContext>,
     req: HttpRequest,
-) -> ActionResult {
-    let token_settings = &settings.token;
+    form: web::Json<models::student::RegisterStudent>,
+) -> RequestResult {
+    let token_settings = &context.settings.token;
 
     let token = auth::TokenWrapper::from_request(req.clone())?;
     let claims = token.validate(token_settings.secret.clone())?;
@@ -110,7 +102,7 @@ async fn add(
 
     let hashed_password = bcrypt::hash(form.password.clone())?;
 
-    let student = db::blocked_access(&pool, move |conn| {
+    let student = db::blocked_access(&context.pool, move |conn| {
         use schema::students::dsl::*;
 
         let new_student = models::student::NewStudent {
@@ -138,12 +130,11 @@ async fn add(
 
 #[delete("/{student_id}")]
 async fn delete(
-    pool: web::Data<DbPool>,
-    settings: web::Data<Settings>,
-    student_id: web::Path<i32>,
+    context: web::Data<RequestContext>,
     req: HttpRequest,
-) -> ActionResult {
-    let token_settings = &settings.token;
+    student_id: web::Path<i32>,
+) -> RequestResult {
+    let token_settings = &context.settings.token;
 
     let token = auth::TokenWrapper::from_request(req.clone())?;
     let claims = token.validate(token_settings.secret.clone())?;
@@ -154,7 +145,7 @@ async fn delete(
 
     let student_id = student_id.into_inner();
 
-    let student = db::blocked_access(&pool, move |conn| {
+    let student = db::blocked_access(&context.pool, move |conn| {
         use schema::students::dsl::*;
 
         diesel::delete(students.filter(id.eq(student_id)))

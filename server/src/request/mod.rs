@@ -1,13 +1,21 @@
 use actix_web::{web, HttpResponse};
 
 use crate::error::BabibappError;
+use crate::settings::Settings;
+use crate::DbPool;
 
 mod comment;
 mod student;
 mod teacher;
 mod token;
 
-type ActionResult = Result<HttpResponse, BabibappError>;
+type RequestResult = Result<HttpResponse, BabibappError>;
+
+#[derive(Clone)]
+pub struct RequestContext {
+    pub pool: DbPool,
+    pub settings: Settings,
+}
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/token").configure(token::config))

@@ -5,6 +5,7 @@ use std::env;
 
 use actix_web::{middleware, web, App, HttpServer};
 use anyhow::anyhow;
+use babibapp::request::RequestContext;
 use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::PgConnection;
 
@@ -54,13 +55,15 @@ async fn main() -> actix_web::Result<(), BabibappError> {
         settings.http.port
     );
 
-    let settings_app_data = settings.clone();
+    let context = RequestContext {
+        pool,
+        settings: settings.clone(),
+    };
 
     // start HTTP server
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(pool.clone()))
-            .app_data(web::Data::new(settings_app_data.clone()))
+            .app_data(web::Data::new(context.clone()))
             .wrap(middleware::Logger::default())
             .configure(request::config)
     })

@@ -1,5 +1,5 @@
 use actix_web::{post, web, HttpResponse};
-use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl};
+use diesel::prelude::*;
 
 use babibapp_models as models;
 use babibapp_schema::schema;
@@ -7,10 +7,7 @@ use pwhash::bcrypt;
 
 use crate::auth;
 use crate::db;
-use crate::settings::Settings;
-use crate::DbPool;
-
-use super::ActionResult;
+use crate::request::{RequestContext, RequestResult};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(generate).service(validate);
@@ -18,12 +15,11 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 #[post("/generate")]
 async fn generate(
-    pool: web::Data<DbPool>,
-    settings: web::Data<Settings>,
+    context: web::Data<RequestContext>,
     form: web::Json<models::student::LoginStudent>,
-) -> ActionResult {
-    let token_settings = &settings.token;
-    let root_settings = &settings.root;
+) -> RequestResult {
+    let token_settings = &context.settings.token;
+    let root_settings = &context.settings.root;
 
     let login_email = form.email.clone();
     let login_email_move = form.email.clone();
@@ -36,7 +32,7 @@ async fn generate(
         )?));
     }
 
-    let student = db::blocked_access(&pool, move |conn| {
+    let student = db::blocked_access(&context.pool, move |conn| {
         use schema::students::dsl::*;
 
         students
@@ -63,10 +59,10 @@ async fn generate(
 
 #[post("/validate")]
 async fn validate(
-    settings: web::Data<Settings>,
+    context: web::Data<RequestContext>,
     token: web::Json<auth::TokenWrapper>,
-) -> ActionResult {
-    let token_settings = &settings.token;
+) -> RequestResult {
+    let token_settings = &context.settings.token;
 
     match token.validate(token_settings.secret.clone()) {
         Ok(_) => Ok(HttpResponse::Ok().body("Valid token")),
