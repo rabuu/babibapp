@@ -15,11 +15,12 @@ However, `babibapp`'s security could be improved. There's Luft nach oben.
 
 - [server](server)
 	- features:
-		- students (basic stuff mostly done)
+		- students (X)
 		- teachers
 		- comments
 		- quotes
-	- user authentication (mostly done)
+		- rankings (?)
+	- user authentication (X)
 - APIs
 	- Rust API
 	- Maybe JavaScript/TypeScipt API
