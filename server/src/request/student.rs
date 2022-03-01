@@ -12,6 +12,13 @@ use crate::error::BabibappError;
 use crate::settings::Settings;
 use crate::DbPool;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(list_all)
+        .service(get)
+        .service(add)
+        .service(delete);
+}
+
 //
 // GET
 //

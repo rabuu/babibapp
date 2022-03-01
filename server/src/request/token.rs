@@ -12,6 +12,10 @@ use crate::DbPool;
 
 use super::ActionResult;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(generate).service(validate);
+}
+
 #[post("/generate")]
 async fn generate(
     pool: web::Data<DbPool>,
