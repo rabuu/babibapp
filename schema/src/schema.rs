@@ -1,7 +1,7 @@
 table! {
     student_comments (id) {
         id -> Int4,
-        author_id -> Nullable<Int4>,
+        author_id -> Int4,
         receiver_id -> Int4,
         body -> Text,
         published -> Timestamp,
@@ -31,7 +31,7 @@ table! {
 table! {
     teacher_comments (id) {
         id -> Int4,
-        author_id -> Nullable<Int4>,
+        author_id -> Int4,
         receiver_id -> Int4,
         body -> Text,
         published -> Timestamp,

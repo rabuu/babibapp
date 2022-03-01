@@ -10,7 +10,7 @@ use crate::error::BabibappError;
 use crate::request::{RequestContext, RequestResult};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(list_all)
+    cfg.service(get_all)
         .service(get)
         .service(add)
         .service(delete);
@@ -20,8 +20,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 // GET
 //
 
-#[get("/list_all")]
-async fn list_all(context: web::Data<RequestContext>, req: HttpRequest) -> RequestResult {
+#[get("/get_all")]
+async fn get_all(context: web::Data<RequestContext>, req: HttpRequest) -> RequestResult {
     let token_settings = &context.settings.token;
 
     let token = auth::TokenWrapper::from_request(req.clone())?;
