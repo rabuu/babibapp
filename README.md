@@ -17,13 +17,14 @@ However, `babibapp`'s security could be improved. There's Luft nach oben.
 	- features:
 		- students (X)
 		- teachers (X)
-		- comments
-		- quotes
-		- rankings (?)
+		- comments (X)
+			- plus votes
+		- (quotes)
+		- (rankings)
 	- user authentication (X)
 - APIs
 	- Rust API
-	- Maybe JavaScript/TypeScipt API
+	- (JavaScript/TypeScipt API)
 - clients
-	- Web UI
 	- Command line interface
+	- (Web UI)
