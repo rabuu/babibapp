@@ -25,6 +25,25 @@ pub struct NewStudentComment {
     pub published: Option<SystemTime>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CreateStudentComment {
+    pub receiver_id: i32,
+    pub body: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct LimitedViewStudentComment {
+    pub id: i32,
+    pub receiver_id: i32,
+    pub body: String,
+    pub published: SystemTime,
+}
+
+pub enum StudentCommentView {
+    Limited(LimitedViewStudentComment),
+    Full(StudentComment),
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, Queryable)]
 pub struct StudentCommentVote {
     pub id: i32,
@@ -57,6 +76,25 @@ pub struct NewTeacherComment {
     pub receiver_id: i32,
     pub body: String,
     pub published: Option<SystemTime>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CreateTeacherComment {
+    pub receiver_id: i32,
+    pub body: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct LimitedViewTeacherComment {
+    pub id: i32,
+    pub receiver_id: i32,
+    pub body: String,
+    pub published: SystemTime,
+}
+
+pub enum TeacherCommentView {
+    Limited(LimitedViewTeacherComment),
+    Full(TeacherComment),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Queryable)]

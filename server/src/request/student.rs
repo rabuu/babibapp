@@ -15,7 +15,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(get)
         .service(get_self)
         .service(get_all)
-        .service(add)
+        .service(register)
         .service(reset_email)
         .service(reset_password)
         .service(reset_name)
@@ -41,7 +41,7 @@ async fn get(
         use schema::students::dsl::*;
 
         students
-            .filter(id.eq(student_id))
+            .find(student_id)
             .first::<models::student::Student>(conn)
             .optional()
     })
@@ -78,7 +78,7 @@ async fn get_self(context: web::Data<RequestContext>, req: HttpRequest) -> Reque
         use schema::students::dsl::*;
 
         students
-            .filter(id.eq(student_id))
+            .find(student_id)
             .first::<models::student::Student>(conn)
             .optional()
     })
@@ -125,8 +125,8 @@ async fn get_all(context: web::Data<RequestContext>, req: HttpRequest) -> Reques
     }
 }
 
-#[post("/add")]
-async fn add(
+#[post("/register")]
+async fn register(
     context: web::Data<RequestContext>,
     req: HttpRequest,
     form: web::Json<models::student::RegisterStudent>,

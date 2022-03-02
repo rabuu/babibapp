@@ -34,7 +34,7 @@ async fn get(
         use schema::teachers::dsl::*;
 
         teachers
-            .filter(id.eq(teacher_id))
+            .find(teacher_id)
             .first::<models::teacher::Teacher>(conn)
             .optional()
     })
@@ -161,7 +161,7 @@ async fn delete(
     let teacher = db::blocked_access(&context.pool, move |conn| {
         use schema::teachers::dsl::*;
 
-        diesel::delete(teachers.filter(id.eq(teacher_id)))
+        diesel::delete(teachers.find(teacher_id))
             .get_result::<models::teacher::Teacher>(conn)
             .optional()
     })
