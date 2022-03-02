@@ -64,11 +64,15 @@ pub fn token_from_claims(claims: Claims, secret: String) -> Result<TokenWrapper,
 }
 
 pub fn token_from_request(req: HttpRequest) -> Result<TokenWrapper, BabibappError> {
-    let auth_header = req
+    let mut auth_header = req
         .headers()
         .get(actix_web::http::header::AUTHORIZATION)
         .ok_or(anyhow::anyhow!("No authorization header"))?
         .to_str()?;
+
+    if auth_header.starts_with("Bearer ") {
+        auth_header = auth_header.strip_prefix("Bearer ").unwrap();
+    }
 
     let wrapped = token_from_jwt(auth_header);
     Ok(wrapped)
