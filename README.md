@@ -18,7 +18,7 @@ However, `babibapp`'s security could be improved. There's Luft nach oben.
 		- students (X)
 		- teachers (X)
 		- comments (X)
-			- plus votes
+			- plus votes (X)
 		- (quotes)
 		- (rankings)
 	- user authentication (X)
