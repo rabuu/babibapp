@@ -87,10 +87,11 @@ async fn get_self(context: web::Data<RequestContext>, req: HttpRequest) -> Reque
     log::debug!("Database response: {:?}", student);
 
     if let Some(student) = student {
-        return Ok(HttpResponse::Ok().json(student));
+        Ok(HttpResponse::Ok().json(student))
+    } else {
+        Ok(HttpResponse::NotFound()
+            .body(format!("No student found with student_id: {}", student_id)))
     }
-
-    Ok(HttpResponse::NotFound().body(format!("No student found with student_id: {}", student_id)))
 }
 
 #[get("/get_all")]
@@ -110,7 +111,7 @@ async fn get_all(context: web::Data<RequestContext>, req: HttpRequest) -> Reques
     log::debug!("Database response: {:?}", students);
 
     if claims.admin {
-        return Ok(HttpResponse::Ok().json(students));
+        Ok(HttpResponse::Ok().json(students))
     } else {
         let limited_view_students: Vec<models::student::LimitedViewStudent> = students
             .into_iter()
@@ -120,7 +121,7 @@ async fn get_all(context: web::Data<RequestContext>, req: HttpRequest) -> Reques
                 last_name: s.last_name,
             })
             .collect();
-        return Ok(HttpResponse::Ok().json(limited_view_students));
+        Ok(HttpResponse::Ok().json(limited_view_students))
     }
 }
 
@@ -189,10 +190,16 @@ async fn reset_email(
         diesel::update(students.find(student_id))
             .set(email.eq(new_email))
             .get_result::<models::student::Student>(conn)
+            .optional()
     })
     .await??;
 
-    Ok(HttpResponse::Ok().json(student))
+    if let Some(student) = student {
+        Ok(HttpResponse::Ok().json(student))
+    } else {
+        Ok(HttpResponse::NotFound()
+            .body(format!("No student found with student_id: {}", student_id)))
+    }
 }
 
 #[put("/reset_password/{student_id}")]
@@ -221,10 +228,16 @@ async fn reset_password(
         diesel::update(students.find(student_id))
             .set(password_hash.eq(hashed_password))
             .get_result::<models::student::Student>(conn)
+            .optional()
     })
     .await??;
 
-    Ok(HttpResponse::Ok().json(student))
+    if let Some(student) = student {
+        Ok(HttpResponse::Ok().json(student))
+    } else {
+        Ok(HttpResponse::NotFound()
+            .body(format!("No student found with student_id: {}", student_id)))
+    }
 }
 
 #[put("/reset_name/{student_id}")]
@@ -254,10 +267,16 @@ async fn reset_name(
                 last_name.eq(form.last_name.clone()),
             ))
             .get_result::<models::student::Student>(conn)
+            .optional()
     })
     .await??;
 
-    Ok(HttpResponse::Ok().json(student))
+    if let Some(student) = student {
+        Ok(HttpResponse::Ok().json(student))
+    } else {
+        Ok(HttpResponse::NotFound()
+            .body(format!("No student found with student_id: {}", student_id)))
+    }
 }
 
 #[put("/make_admin/{student_id}")]
@@ -283,10 +302,16 @@ async fn make_admin(
         diesel::update(students.find(student_id))
             .set(admin.eq(true))
             .get_result::<models::student::Student>(conn)
+            .optional()
     })
     .await??;
 
-    Ok(HttpResponse::Ok().json(student))
+    if let Some(student) = student {
+        Ok(HttpResponse::Ok().json(student))
+    } else {
+        Ok(HttpResponse::NotFound()
+            .body(format!("No student found with student_id: {}", student_id)))
+    }
 }
 
 #[put("/full_reset/{student_id}")]
@@ -322,10 +347,16 @@ async fn full_reset(
                 admin.eq(new_admin_status),
             ))
             .get_result::<models::student::Student>(conn)
+            .optional()
     })
     .await??;
 
-    Ok(HttpResponse::Ok().json(student))
+    if let Some(student) = student {
+        Ok(HttpResponse::Ok().json(student))
+    } else {
+        Ok(HttpResponse::NotFound()
+            .body(format!("No student found with student_id: {}", student_id)))
+    }
 }
 
 #[delete("/delete/{student_id}")]

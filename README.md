@@ -16,7 +16,7 @@ However, `babibapp`'s security could be improved. There's Luft nach oben.
 - [server](server)
 	- features:
 		- students (X)
-		- teachers
+		- teachers (X)
 		- comments
 		- quotes
 		- rankings (?)
