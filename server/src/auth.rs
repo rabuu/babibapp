@@ -3,6 +3,8 @@ use chrono::{Duration, Utc};
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
+pub use babibapp_models::wrappers::TokenWrapper;
+
 use crate::error::BabibappError;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -50,35 +52,24 @@ pub fn validate_token(token: &str, secret: String) -> Result<Claims, BabibappErr
     Ok(claims)
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct TokenWrapper {
-    pub token: String,
+pub fn token_from_jwt(jwt: &str) -> TokenWrapper {
+    TokenWrapper {
+        token: jwt.to_string(),
+    }
 }
 
-impl TokenWrapper {
-    pub fn from_jwt(jwt: &str) -> Self {
-        TokenWrapper {
-            token: jwt.to_string(),
-        }
-    }
+pub fn token_from_claims(claims: Claims, secret: String) -> Result<TokenWrapper, BabibappError> {
+    let jwt = create_jwt(claims, secret)?;
+    Ok(token_from_jwt(&jwt))
+}
 
-    pub fn from_claims(claims: Claims, secret: String) -> Result<Self, BabibappError> {
-        let jwt = create_jwt(claims, secret)?;
-        Ok(Self::from_jwt(&jwt))
-    }
+pub fn token_from_request(req: HttpRequest) -> Result<TokenWrapper, BabibappError> {
+    let auth_header = req
+        .headers()
+        .get(actix_web::http::header::AUTHORIZATION)
+        .ok_or(anyhow::anyhow!("No authorization header"))?
+        .to_str()?;
 
-    pub fn from_request(req: HttpRequest) -> Result<Self, BabibappError> {
-        let auth_header = req
-            .headers()
-            .get(actix_web::http::header::AUTHORIZATION)
-            .ok_or(anyhow::anyhow!("No authorization header"))?
-            .to_str()?;
-
-        let wrapped = Self::from_jwt(auth_header);
-        Ok(wrapped)
-    }
-
-    pub fn validate(&self, secret: String) -> Result<Claims, BabibappError> {
-        validate_token(&self.token, secret).map_err(|_| anyhow::anyhow!("Invalid token").into())
-    }
+    let wrapped = token_from_jwt(auth_header);
+    Ok(wrapped)
 }

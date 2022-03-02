@@ -1,5 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TokenWrapper {
+    pub token: String,
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct EmailWrapper {
     pub email: String,

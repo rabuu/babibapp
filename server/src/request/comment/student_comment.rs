@@ -29,8 +29,8 @@ async fn get(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let comment_id = comment_id.into_inner();
 
@@ -67,8 +67,8 @@ async fn get(
 async fn get_all(context: web::Data<RequestContext>, req: HttpRequest) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let comments = db::blocked_access(&context.pool, |conn| {
         use schema::student_comments::table;
@@ -104,8 +104,8 @@ async fn get_vote(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let _ = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let _ = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let query_comment_id = comment_id.into_inner();
 
@@ -140,8 +140,8 @@ async fn create(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let comment = db::blocked_access(&context.pool, move |conn| {
         use schema::student_comments::dsl::*;
@@ -172,8 +172,8 @@ async fn do_upvote(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let query_comment_id = comment_id.into_inner();
 
@@ -219,8 +219,8 @@ async fn do_downvote(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let query_comment_id = comment_id.into_inner();
 
@@ -266,8 +266,8 @@ async fn do_unvote(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let query_comment_id = comment_id.into_inner();
 
@@ -298,8 +298,8 @@ async fn delete(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let comment_id = comment_id.into_inner();
 

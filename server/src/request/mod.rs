@@ -8,7 +8,6 @@ mod comment;
 mod student;
 mod teacher;
 mod token;
-mod wrappers;
 
 type RequestResult = Result<HttpResponse, BabibappError>;
 

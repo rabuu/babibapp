@@ -1,14 +1,14 @@
 use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse};
 use diesel::prelude::*;
+use pwhash::bcrypt;
 
 use babibapp_models as models;
 use babibapp_schema::schema;
-use pwhash::bcrypt;
+use models::wrappers::*;
 
 use crate::auth;
 use crate::db;
 use crate::error::BabibappError;
-use crate::request::wrappers::*;
 use crate::request::{RequestContext, RequestResult};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -32,8 +32,8 @@ async fn get(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let student_id = student_id.into_inner();
 
@@ -69,8 +69,8 @@ async fn get(
 async fn get_self(context: web::Data<RequestContext>, req: HttpRequest) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let student_id = claims.id;
 
@@ -98,8 +98,8 @@ async fn get_self(context: web::Data<RequestContext>, req: HttpRequest) -> Reque
 async fn get_all(context: web::Data<RequestContext>, req: HttpRequest) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let students = db::blocked_access(&context.pool, |conn| {
         use schema::students::table;
@@ -133,8 +133,8 @@ async fn register(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     if !claims.admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
@@ -173,8 +173,8 @@ async fn reset_email(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let student_id = student_id.into_inner();
 
@@ -211,8 +211,8 @@ async fn reset_password(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let student_id = student_id.into_inner();
 
@@ -249,8 +249,8 @@ async fn reset_name(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let student_id = student_id.into_inner();
 
@@ -287,8 +287,8 @@ async fn make_admin(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let student_id = student_id.into_inner();
 
@@ -323,8 +323,8 @@ async fn full_reset(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let student_id = student_id.into_inner();
 
@@ -367,8 +367,8 @@ async fn delete(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let student_id = student_id.into_inner();
 

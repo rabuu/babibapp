@@ -25,8 +25,8 @@ async fn get(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let _ = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let _ = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let teacher_id = teacher_id.into_inner();
 
@@ -54,8 +54,8 @@ async fn get(
 async fn get_all(context: web::Data<RequestContext>, req: HttpRequest) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let _ = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let _ = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     let teachers = db::blocked_access(&context.pool, |conn| {
         use schema::teachers::table;
@@ -77,8 +77,8 @@ async fn add(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     if !claims.admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
@@ -112,8 +112,8 @@ async fn reset(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     if !claims.admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));
@@ -149,8 +149,8 @@ async fn delete(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    let token = auth::TokenWrapper::from_request(req.clone())?;
-    let claims = token.validate(token_settings.secret.clone())?;
+    let token = auth::token_from_request(req.clone())?;
+    let claims = auth::validate_token(&token.token, token_settings.secret.clone())?;
 
     if !claims.admin {
         return Ok(HttpResponse::Unauthorized().body("Access only for admins"));

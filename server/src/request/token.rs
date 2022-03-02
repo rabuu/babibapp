@@ -26,7 +26,7 @@ async fn generate(
     let login_password = form.password.clone();
 
     if login_email == root_settings.email && login_password == root_settings.password {
-        return Ok(HttpResponse::Ok().json(auth::TokenWrapper::from_claims(
+        return Ok(HttpResponse::Ok().json(auth::token_from_claims(
             auth::Claims::root(root_settings.expiration_minutes),
             token_settings.secret.clone(),
         )?));
@@ -46,7 +46,7 @@ async fn generate(
         if bcrypt::verify(&login_password, &student.password_hash) {
             let claims =
                 auth::Claims::new(student.id, student.admin, token_settings.expiration_hours);
-            Ok(HttpResponse::Ok().json(auth::TokenWrapper::from_claims(
+            Ok(HttpResponse::Ok().json(auth::token_from_claims(
                 claims,
                 token_settings.secret.clone(),
             )?))
@@ -65,7 +65,7 @@ async fn validate(
 ) -> RequestResult {
     let token_settings = &context.settings.token;
 
-    match token.validate(token_settings.secret.clone()) {
+    match auth::validate_token(&token.into_inner().token, token_settings.secret.clone()) {
         Ok(_) => Ok(HttpResponse::Ok().body("Valid token")),
         Err(e) => Ok(HttpResponse::Unauthorized().body(format!("{}", e))),
     }
