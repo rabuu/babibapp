@@ -39,6 +39,7 @@ pub struct LimitedViewStudentComment {
     pub published: SystemTime,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum StudentCommentView {
     Limited(LimitedViewStudentComment),
     Full(StudentComment),
@@ -92,6 +93,7 @@ pub struct LimitedViewTeacherComment {
     pub published: SystemTime,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum TeacherCommentView {
     Limited(LimitedViewTeacherComment),
     Full(TeacherComment),
