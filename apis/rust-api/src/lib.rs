@@ -69,7 +69,7 @@ impl BabibappClient {
     }
 
     pub async fn get_student(&self, student_id: i32) -> Result<StudentView, BabibappApiError> {
-        let student: StudentView = self
+        let student = self
             .http
             .get(format!("{}/student/get/{}", self.base_url, student_id))
             .bearer_auth(&self.token)
@@ -81,7 +81,7 @@ impl BabibappClient {
     }
 
     pub async fn get_self(&self) -> Result<Student, BabibappApiError> {
-        let student: Student = self
+        let student = self
             .http
             .get(format!("{}/student/get_self", self.base_url))
             .bearer_auth(&self.token)
@@ -93,7 +93,7 @@ impl BabibappClient {
     }
 
     pub async fn get_all_students(&self) -> Result<Vec<StudentView>, BabibappApiError> {
-        let students: Vec<StudentView> = self
+        let students = self
             .http
             .get(format!("{}/student/get_all", self.base_url))
             .bearer_auth(&self.token)
@@ -268,5 +268,83 @@ impl BabibappClient {
             .json()
             .await?;
         Ok(student)
+    }
+
+    pub async fn get_teacher(&self, teacher_id: i32) -> Result<Teacher, BabibappApiError> {
+        let teacher = self
+            .http
+            .get(format!("{}/teacher/get/{}", self.base_url, teacher_id))
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(teacher)
+    }
+
+    pub async fn get_all_teachers(&self) -> Result<Vec<Teacher>, BabibappApiError> {
+        let teachers = self
+            .http
+            .get(format!("{}/teacher/get_all", self.base_url))
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(teachers)
+    }
+
+    pub async fn add_teacher(&self, name: &str, prefix: &str) -> Result<Teacher, BabibappApiError> {
+        let new_teacher = NewTeacher {
+            name: name.to_string(),
+            prefix: prefix.to_string(),
+        };
+
+        let teacher = self
+            .http
+            .post(format!("{}/teacher/add", self.base_url))
+            .json(&new_teacher)
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(teacher)
+    }
+
+    pub async fn reset_teacher(
+        &self,
+        teacher_id: i32,
+        name: &str,
+        prefix: &str,
+    ) -> Result<Teacher, BabibappApiError> {
+        let reset_teacher = NewTeacher {
+            name: name.to_string(),
+            prefix: prefix.to_string(),
+        };
+
+        let teacher = self
+            .http
+            .put(format!("{}/teacher/reset/{}", self.base_url, teacher_id))
+            .json(&reset_teacher)
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(teacher)
+    }
+
+    pub async fn delete_teacher(&self, teacher_id: i32) -> Result<Teacher, BabibappApiError> {
+        let teacher = self
+            .http
+            .delete(format!("{}/teacher/delete/{}", self.base_url, teacher_id))
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(teacher)
     }
 }
