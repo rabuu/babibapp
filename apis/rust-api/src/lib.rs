@@ -51,6 +51,23 @@ impl BabibappClient {
         })
     }
 
+    pub async fn validate_token(&self) -> Result<bool, BabibappApiError> {
+        let token = TokenWrapper {
+            token: self.token.clone(),
+        };
+
+        let response = self
+            .http
+            .post(format!("{}/token/validate", self.base_url))
+            .json(&token)
+            .send()
+            .await?
+            .text()
+            .await?;
+
+        Ok(response == "Valid token")
+    }
+
     pub async fn get_student(&self, student_id: i32) -> Result<StudentView, BabibappApiError> {
         let student: StudentView = self
             .http
