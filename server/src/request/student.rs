@@ -20,7 +20,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .service(reset_password)
         .service(reset_name)
         .service(make_admin)
-        .service(full_reset)
+        .service(reset_full)
         .service(delete);
 }
 
@@ -314,8 +314,8 @@ async fn make_admin(
     }
 }
 
-#[put("/full_reset/{student_id}")]
-async fn full_reset(
+#[put("/reset_full/{student_id}")]
+async fn reset_full(
     context: web::Data<RequestContext>,
     req: HttpRequest,
     student_id: web::Path<i32>,
