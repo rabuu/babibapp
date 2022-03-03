@@ -2,6 +2,7 @@ use error::BabibappApiError;
 use reqwest::Client as HttpClient;
 
 use crate::types::*;
+use babibapp_models::wrappers::{EmailWrapper, NameWrapper, PasswordWrapper, TokenWrapper};
 
 pub mod error;
 pub mod types;
@@ -346,5 +347,253 @@ impl BabibappClient {
             .json()
             .await?;
         Ok(teacher)
+    }
+
+    pub async fn get_student_comment(
+        &self,
+        comment_id: i32,
+    ) -> Result<StudentCommentView, BabibappApiError> {
+        let comment = self
+            .http
+            .get(format!(
+                "{}/comment/student/get/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(comment)
+    }
+
+    pub async fn get_all_student_comments(
+        &self,
+    ) -> Result<Vec<StudentCommentView>, BabibappApiError> {
+        let comments = self
+            .http
+            .get(format!("{}/comment/student/get_all", self.base_url))
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(comments)
+    }
+
+    pub async fn get_student_comment_vote(&self, comment_id: i32) -> Result<i64, BabibappApiError> {
+        let vote = self
+            .http
+            .get(format!(
+                "{}/comment/student/get_vote/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(vote)
+    }
+
+    pub async fn create_student_comment(
+        &self,
+        receiver_id: i32,
+        body: &str,
+    ) -> Result<StudentComment, BabibappApiError> {
+        let new_comment = CreateStudentComment {
+            receiver_id,
+            body: body.to_string(),
+        };
+
+        let comment = self
+            .http
+            .post(format!("{}/comment/student/create", self.base_url))
+            .json(&new_comment)
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(comment)
+    }
+
+    pub async fn upvote_student_comment(&self, comment_id: i32) -> Result<(), BabibappApiError> {
+        self.http
+            .post(format!(
+                "{}/comment/student/upvote/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?;
+        Ok(())
+    }
+
+    pub async fn downvote_student_comment(&self, comment_id: i32) -> Result<(), BabibappApiError> {
+        self.http
+            .post(format!(
+                "{}/comment/student/downvote/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?;
+        Ok(())
+    }
+
+    pub async fn unvote_student_comment(&self, comment_id: i32) -> Result<(), BabibappApiError> {
+        self.http
+            .post(format!(
+                "{}/comment/student/unvote/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?;
+        Ok(())
+    }
+
+    pub async fn delete_student_comment(
+        &self,
+        comment_id: i32,
+    ) -> Result<StudentComment, BabibappApiError> {
+        let comment = self
+            .http
+            .delete(format!(
+                "{}/comment/student/delete/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(comment)
+    }
+
+    pub async fn get_teacher_comment(
+        &self,
+        comment_id: i32,
+    ) -> Result<TeacherCommentView, BabibappApiError> {
+        let comment = self
+            .http
+            .get(format!(
+                "{}/comment/teacher/get/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(comment)
+    }
+
+    pub async fn get_all_teacher_comments(
+        &self,
+    ) -> Result<Vec<TeacherCommentView>, BabibappApiError> {
+        let comments = self
+            .http
+            .get(format!("{}/comment/teacher/get_all", self.base_url))
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(comments)
+    }
+
+    pub async fn get_teacher_comment_vote(&self, comment_id: i32) -> Result<i64, BabibappApiError> {
+        let vote = self
+            .http
+            .get(format!(
+                "{}/comment/teacher/get_vote/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(vote)
+    }
+
+    pub async fn create_teacher_comment(
+        &self,
+        receiver_id: i32,
+        body: &str,
+    ) -> Result<TeacherComment, BabibappApiError> {
+        let new_comment = CreateTeacherComment {
+            receiver_id,
+            body: body.to_string(),
+        };
+
+        let comment = self
+            .http
+            .post(format!("{}/comment/teacher/create", self.base_url))
+            .json(&new_comment)
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(comment)
+    }
+
+    pub async fn upvote_teacher_comment(&self, comment_id: i32) -> Result<(), BabibappApiError> {
+        self.http
+            .post(format!(
+                "{}/comment/teacher/upvote/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?;
+        Ok(())
+    }
+
+    pub async fn downvote_teacher_comment(&self, comment_id: i32) -> Result<(), BabibappApiError> {
+        self.http
+            .post(format!(
+                "{}/comment/teacher/downvote/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?;
+        Ok(())
+    }
+
+    pub async fn unvote_teacher_comment(&self, comment_id: i32) -> Result<(), BabibappApiError> {
+        self.http
+            .post(format!(
+                "{}/comment/teacher/unvote/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?;
+        Ok(())
+    }
+
+    pub async fn delete_teacher_comment(
+        &self,
+        comment_id: i32,
+    ) -> Result<TeacherComment, BabibappApiError> {
+        let comment = self
+            .http
+            .delete(format!(
+                "{}/comment/teacher/delete/{}",
+                self.base_url, comment_id
+            ))
+            .bearer_auth(&self.token)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(comment)
     }
 }
