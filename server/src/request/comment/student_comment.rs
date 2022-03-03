@@ -47,17 +47,19 @@ async fn get(
     log::debug!("Database response: {:?}", comment);
 
     if let Some(comment) = comment {
-        if claims.id == comment.author_id || claims.admin {
-            return Ok(HttpResponse::Ok().json(comment));
+        let comment_view = if claims.id == comment.author_id || claims.admin {
+            models::comment::StudentCommentView::Full(comment)
         } else {
-            let limited_view_student_comment = models::comment::LimitedViewStudentComment {
+            let limited = models::comment::LimitedViewStudentComment {
                 id: comment.id,
                 receiver_id: comment.receiver_id,
                 body: comment.body,
                 published: comment.published,
             };
-            return Ok(HttpResponse::Ok().json(limited_view_student_comment));
-        }
+            models::comment::StudentCommentView::Limited(limited)
+        };
+
+        return Ok(HttpResponse::Ok().json(comment_view));
     }
 
     Ok(HttpResponse::NotFound().body(format!("No comment found with comment_id: {}", comment_id)))
@@ -79,21 +81,24 @@ async fn get_all(context: web::Data<RequestContext>, req: HttpRequest) -> Reques
 
     log::debug!("Database response: {:?}", comments);
 
-    if claims.admin {
-        Ok(HttpResponse::Ok().json(comments))
-    } else {
-        let limited_view_student_comments: Vec<models::comment::LimitedViewStudentComment> =
-            comments
-                .into_iter()
-                .map(|c| models::comment::LimitedViewStudentComment {
+    let comment_views: Vec<models::comment::StudentCommentView> = comments
+        .into_iter()
+        .map(|c| {
+            if claims.id == c.author_id || claims.admin {
+                models::comment::StudentCommentView::Full(c)
+            } else {
+                let limited = models::comment::LimitedViewStudentComment {
                     id: c.id,
                     receiver_id: c.receiver_id,
                     body: c.body,
                     published: c.published,
-                })
-                .collect();
-        Ok(HttpResponse::Ok().json(limited_view_student_comments))
-    }
+                };
+                models::comment::StudentCommentView::Limited(limited)
+            }
+        })
+        .collect();
+
+    Ok(HttpResponse::Ok().json(comment_views))
 }
 
 #[get("/get_vote/{comment_id}")]

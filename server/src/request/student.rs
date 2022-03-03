@@ -50,16 +50,18 @@ async fn get(
     log::debug!("Database response: {:?}", student);
 
     if let Some(student) = student {
-        if claims.id == student.id || claims.admin {
-            return Ok(HttpResponse::Ok().json(student));
+        let student_view = if claims.id == student.id || claims.admin {
+            models::student::StudentView::Full(student)
         } else {
-            let limited_view_student = models::student::LimitedViewStudent {
+            let limited = models::student::LimitedViewStudent {
                 id: student.id,
                 first_name: student.first_name,
                 last_name: student.last_name,
             };
-            return Ok(HttpResponse::Ok().json(limited_view_student));
-        }
+            models::student::StudentView::Limited(limited)
+        };
+
+        return Ok(HttpResponse::Ok().json(student_view));
     }
 
     Ok(HttpResponse::NotFound().body(format!("No student found with student_id: {}", student_id)))
@@ -110,19 +112,23 @@ async fn get_all(context: web::Data<RequestContext>, req: HttpRequest) -> Reques
 
     log::debug!("Database response: {:?}", students);
 
-    if claims.admin {
-        Ok(HttpResponse::Ok().json(students))
-    } else {
-        let limited_view_students: Vec<models::student::LimitedViewStudent> = students
-            .into_iter()
-            .map(|s| models::student::LimitedViewStudent {
-                id: s.id,
-                first_name: s.first_name,
-                last_name: s.last_name,
-            })
-            .collect();
-        Ok(HttpResponse::Ok().json(limited_view_students))
-    }
+    let student_views: Vec<models::student::StudentView> = students
+        .into_iter()
+        .map(|s| {
+            if claims.id == s.id || claims.admin {
+                models::student::StudentView::Full(s)
+            } else {
+                let limited = models::student::LimitedViewStudent {
+                    id: s.id,
+                    first_name: s.first_name,
+                    last_name: s.last_name,
+                };
+                models::student::StudentView::Limited(limited)
+            }
+        })
+        .collect();
+
+    Ok(HttpResponse::Ok().json(student_views))
 }
 
 #[post("/register")]
