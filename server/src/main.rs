@@ -4,7 +4,6 @@ extern crate diesel_migrations;
 use std::env;
 
 use actix_web::{middleware, web, App, HttpServer};
-use anyhow::anyhow;
 use babibapp::request::RequestContext;
 use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::PgConnection;
@@ -20,9 +19,9 @@ embed_migrations!();
 #[actix_web::main]
 async fn main() -> actix_web::Result<(), BabibappError> {
     let mut args = env::args().skip(1);
-    let settings_path = args.next().ok_or(anyhow!(
-        "Expected argument `settings_path`, but got nothing",
-    ))?;
+    let settings_path = args
+        .next()
+        .unwrap_or("/etc/babibapp/server.conf".to_string());
     let settings = Settings::from_toml(&settings_path).unwrap();
 
     // init logging
