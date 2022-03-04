@@ -20,7 +20,6 @@ impl BabibappClient {
         email: &str,
         password: &str,
     ) -> Result<BabibappClient, BabibappApiError> {
-        let base_url = format!("http://{}", base_url);
         let http = HttpClient::new();
 
         let login = LoginStudent {
@@ -45,7 +44,7 @@ impl BabibappClient {
             .await?;
 
         Ok(BabibappClient {
-            base_url,
+            base_url: base_url.to_string(),
             http,
             token,
             id: me.id,
