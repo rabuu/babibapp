@@ -21,7 +21,7 @@ async fn main() -> actix_web::Result<(), BabibappError> {
     let mut args = env::args().skip(1);
     let settings_path = args
         .next()
-        .unwrap_or("/etc/babibapp/server.conf".to_string());
+        .unwrap_or("/etc/babibapp/server.toml".to_string());
     let settings = Settings::from_toml(&settings_path).unwrap();
 
     // init logging
