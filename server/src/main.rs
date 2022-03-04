@@ -1,3 +1,5 @@
+extern crate openssl;
+
 #[macro_use]
 extern crate diesel_migrations;
 
@@ -22,7 +24,7 @@ async fn main() -> actix_web::Result<(), BabibappError> {
     let settings_path = args
         .next()
         .unwrap_or("/etc/babibapp/server.toml".to_string());
-    let settings = Settings::from_toml(&settings_path).unwrap();
+    let settings = Settings::from_toml(&settings_path).expect("Loading settings file failed");
 
     // init logging
     env_logger::init_from_env(Env::new().default_filter_or("info"));

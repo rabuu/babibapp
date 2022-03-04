@@ -19,7 +19,4 @@ env_logger = "0.9"
 chrono = "0.4"
 jsonwebtoken = "8.0"
 pwhash = "1.0"
-openssl-sys = "0.9"
-
-[features]
-vendored = ["openssl-sys/vendored"]
+openssl = "0.10"

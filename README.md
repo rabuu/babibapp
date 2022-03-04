@@ -11,6 +11,18 @@ User authentication is done using [JWTs](https://jwt.io).
 Passwords are only stored on the server as [bcrypt](https://en.wikipedia.org/wiki/Bcrypt) hashes.
 However, `babibapp`'s security could be improved. There's Luft nach oben.
 
+## musl cross compilation
+To built a static binary yo may want to compile with `libmusl`.
+To make this work you can compile the server in a Alpine Docker environment.
+Use this command:
+
+```console
+alias rust-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src ekidd/rust-musl-builder'
+rust-musl-builder cargo build --release
+```
+
+See [emk/rust-musl-builder](https://github.com/emk/rust-musl-builder).
+
 ## TODO
 
 - [server](server)
