@@ -23,8 +23,8 @@ However, `babibapp`'s security could be improved. There's Luft nach oben.
 		- (rankings)
 	- user authentication (X)
 - APIs
-	- Rust API
+	- Rust API (X)
 	- (JavaScript/TypeScript API)
 - clients
-	- Command line interface
+	- Terminal UI
 	- (Web UI)
