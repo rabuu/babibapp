@@ -5,4 +5,5 @@ members = [
 	"schema",
 	"models",
 	"apis/rust-api",
+	"clients/cli",
 ]
