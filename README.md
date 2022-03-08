@@ -12,7 +12,7 @@ Passwords are only stored on the server as [bcrypt](https://en.wikipedia.org/wik
 However, `babibapp`'s security could be improved. There's Luft nach oben.
 
 ## musl cross compilation
-To built a static binary yo may want to compile with `libmusl`.
+To build the server as a static binary you may want to compile to [`musl libc`](https://www.musl-libc.org).
 To make this work you can compile the server in a Alpine Docker environment.
 Use this command:
 
@@ -34,9 +34,9 @@ See [emk/rust-musl-builder](https://github.com/emk/rust-musl-builder).
 		- (quotes)
 		- (rankings)
 	- user authentication (X)
-- APIs
-	- Rust API (X)
+- [APIs](apis)
+	- [Rust API](apis/rust-api) (X)
 	- (JavaScript/TypeScript API)
-- clients
-	- Terminal UI
+- [clients](clients)
+	- [Command line interface](clients/cli)
 	- (Web UI)
