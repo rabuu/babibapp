@@ -11,7 +11,6 @@ pub struct BabibappClient {
     base_url: String,
     http: HttpClient,
     token: String,
-    pub id: i32,
 }
 
 impl BabibappClient {
@@ -35,19 +34,10 @@ impl BabibappClient {
             .json()
             .await?;
 
-        let me: Student = http
-            .get(format!("{}/student/get_self", base_url))
-            .bearer_auth(&token)
-            .send()
-            .await?
-            .json()
-            .await?;
-
         Ok(BabibappClient {
             base_url: base_url.to_string(),
             http,
             token,
-            id: me.id,
         })
     }
 
