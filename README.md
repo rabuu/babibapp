@@ -12,11 +12,11 @@ Passwords are only stored on the server as [bcrypt](https://en.wikipedia.org/wik
 However, `babibapp`'s security could be improved. There's Luft nach oben.
 
 ## musl cross compilation
-To build the server as a static binary you may want to compile to [`musl libc`](https://www.musl-libc.org).
-To make this work you can compile the server in a Alpine Docker environment.
+To build the static binaries you may want to compile to [`musl libc`](https://www.musl-libc.org).
+To make this work you can compile the server and the CLI in an Alpine Docker environment.
 Use this command:
 
-```console
+```sh
 alias rust-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src ekidd/rust-musl-builder'
 rust-musl-builder cargo build --release
 ```
