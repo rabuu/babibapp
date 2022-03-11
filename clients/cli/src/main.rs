@@ -61,6 +61,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "get_all_students".to_string(),
         "register_student".to_string(),
         "reset_student".to_string(),
+        "delete_student".to_string(),
         "clear".to_string(),
         "help".to_string(),
         "exit".to_string(),
@@ -306,6 +307,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 let password: String =
                                     match dialoguer::Password::with_theme(&info_theme)
                                         .with_prompt("Password")
+                                        .with_confirmation(
+                                            "Repeat password",
+                                            "The passwords do not match",
+                                        )
                                         .interact()
                                     {
                                         Ok(password) => password,
@@ -413,6 +418,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 let password: String =
                                     match dialoguer::Password::with_theme(&info_theme)
                                         .with_prompt("Password")
+                                        .with_confirmation(
+                                            "Repeat password",
+                                            "The passwords do not match",
+                                        )
                                         .interact()
                                     {
                                         Ok(password) => password,
@@ -469,6 +478,38 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     };
 
                     println!("Student successfully reset!");
+                    babicli::view_student(&StudentView::Full(student));
+                }
+
+                Some("delete_student") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid student id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid student id");
+                            continue;
+                        }
+                    };
+
+                    let student = match babibapp.delete_student(id).await {
+                        Ok(student) => student,
+                        Err(_) => {
+                            eprintln!("Failed to delete student");
+                            continue;
+                        }
+                    };
+
+                    println!("Student successfully deleted!");
                     babicli::view_student(&StudentView::Full(student));
                 }
 
