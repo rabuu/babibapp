@@ -32,11 +32,11 @@ impl<T: ToString> History<T> for BabicliHistory {
 }
 
 pub struct BabicliCompletion {
-    options: Vec<String>,
+    options: Vec<&'static str>,
 }
 
 impl BabicliCompletion {
-    pub fn new(options: &[String]) -> Self {
+    pub fn new(options: &[&'static str]) -> Self {
         Self {
             options: options.to_vec(),
         }
