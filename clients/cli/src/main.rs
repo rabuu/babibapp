@@ -121,6 +121,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "add_teacher",
         "reset_teacher",
         "delete_teacher",
+        "show_student_comment",
+        "show_all_student_comments",
         "clear",
         "help",
         "exit",
@@ -774,6 +776,148 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                     println!("Teacher successfully deleted!");
                     babicli::view_teacher(&teacher);
+                }
+
+                Some("show_student_comment") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    };
+
+                    let comment = match babibapp.get_student_comment(id).await {
+                        Ok(comment) => comment,
+                        Err(_) => {
+                            eprintln!("Failed to get student comment");
+                            continue;
+                        }
+                    };
+
+                    let vote = match babibapp.get_student_comment_vote(id).await {
+                        Ok(vote) => vote,
+                        Err(_) => {
+                            eprintln!("Failed to get student comment vote");
+                            continue;
+                        }
+                    };
+
+                    match comment {
+                        StudentCommentView::Limited(comment) => {
+                            let receiver = match babibapp.get_student(comment.receiver_id).await {
+                                Ok(student) => student,
+                                Err(_) => {
+                                    eprintln!("Failed to get receiver student");
+                                    continue;
+                                }
+                            };
+
+                            babicli::view_student_comment_limited(&comment, &receiver, vote);
+                        }
+                        StudentCommentView::Full(comment) => {
+                            let receiver = match babibapp.get_student(comment.receiver_id).await {
+                                Ok(student) => student,
+                                Err(_) => {
+                                    eprintln!("Failed to get receiver student");
+                                    continue;
+                                }
+                            };
+
+                            let author = match babibapp.get_student(comment.author_id).await {
+                                Ok(student) => student,
+                                Err(_) => {
+                                    eprintln!("Failed to get author");
+                                    continue;
+                                }
+                            };
+
+                            babicli::view_student_comment_full(&comment, &receiver, &author, vote);
+                        }
+                    }
+                }
+
+                Some("show_all_student_comments") => {
+                    let comments = match babibapp.get_all_student_comments().await {
+                        Ok(comments) => comments,
+                        Err(_) => {
+                            eprintln!("Failed to get all student comments");
+                            continue;
+                        }
+                    };
+
+                    if comments.is_empty() {
+                        println!("No student comments found!");
+                        continue;
+                    }
+
+                    for comment in &comments {
+                        match comment {
+                            StudentCommentView::Limited(comment) => {
+                                let vote = match babibapp.get_student_comment_vote(comment.id).await
+                                {
+                                    Ok(vote) => vote,
+                                    Err(_) => {
+                                        eprintln!("Failed to get student comment vote");
+                                        continue;
+                                    }
+                                };
+
+                                let receiver = match babibapp.get_student(comment.receiver_id).await
+                                {
+                                    Ok(student) => student,
+                                    Err(_) => {
+                                        eprintln!("Failed to get receiver student");
+                                        continue;
+                                    }
+                                };
+
+                                babicli::view_student_comment_limited(&comment, &receiver, vote);
+                            }
+                            StudentCommentView::Full(comment) => {
+                                let vote = match babibapp.get_student_comment_vote(comment.id).await
+                                {
+                                    Ok(vote) => vote,
+                                    Err(_) => {
+                                        eprintln!("Failed to get student comment vote");
+                                        continue;
+                                    }
+                                };
+
+                                let receiver = match babibapp.get_student(comment.receiver_id).await
+                                {
+                                    Ok(student) => student,
+                                    Err(_) => {
+                                        eprintln!("Failed to get receiver student");
+                                        continue;
+                                    }
+                                };
+
+                                let author = match babibapp.get_student(comment.author_id).await {
+                                    Ok(student) => student,
+                                    Err(_) => {
+                                        eprintln!("Failed to get author");
+                                        continue;
+                                    }
+                                };
+
+                                babicli::view_student_comment_full(
+                                    &comment, &receiver, &author, vote,
+                                );
+                            }
+                        }
+                    }
                 }
 
                 Some("clear") => print!("\x1B[2J\x1B[1;1H"),

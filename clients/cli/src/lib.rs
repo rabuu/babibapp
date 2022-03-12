@@ -1,5 +1,7 @@
 use std::collections::VecDeque;
 
+use chrono::offset::Local;
+use chrono::DateTime;
 use dialoguer::{Completion, History};
 
 use babibapp_api::types::*;
@@ -83,4 +85,60 @@ pub fn view_teacher(teacher: &Teacher) {
     println!("{} {}", teacher.prefix, teacher.name);
     println!("----------------");
     println!("id: {}", teacher.id);
+}
+
+pub fn view_student_comment_limited(
+    comment: &LimitedViewStudentComment,
+    recv: &StudentView,
+    vote: i64,
+) {
+    let recv_name = match recv {
+        StudentView::Limited(student) => (&student.first_name, &student.last_name),
+        StudentView::Full(student) => (&student.first_name, &student.last_name),
+    };
+
+    let published: DateTime<Local> = comment.published.into();
+
+    println!(
+        "TO {} {} [{}]",
+        recv_name.0,
+        recv_name.1,
+        published.format("%d.%m.%Y %T")
+    );
+    println!("----------------");
+    println!("{}", comment.body);
+    println!("----------------");
+    println!("Vote: {}", vote);
+}
+
+pub fn view_student_comment_full(
+    comment: &StudentComment,
+    recv: &StudentView,
+    author: &StudentView,
+    vote: i64,
+) {
+    let recv_name = match recv {
+        StudentView::Limited(student) => (&student.first_name, &student.last_name),
+        StudentView::Full(student) => (&student.first_name, &student.last_name),
+    };
+
+    let author_name = match author {
+        StudentView::Limited(student) => (&student.first_name, &student.last_name),
+        StudentView::Full(student) => (&student.first_name, &student.last_name),
+    };
+
+    let published: DateTime<Local> = comment.published.into();
+
+    println!(
+        "{} {} TO {} {} [{}]",
+        author_name.0,
+        author_name.1,
+        recv_name.0,
+        recv_name.1,
+        published.format("%d.%m.%Y %T")
+    );
+    println!("----------------");
+    println!("{}", comment.body);
+    println!("----------------");
+    println!("Vote: {}", vote);
 }

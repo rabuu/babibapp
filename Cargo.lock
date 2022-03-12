@@ -295,6 +295,7 @@ name = "babicli"
 version = "0.1.0"
 dependencies = [
  "babibapp_api",
+ "chrono",
  "clap",
  "dialoguer",
  "tokio",
