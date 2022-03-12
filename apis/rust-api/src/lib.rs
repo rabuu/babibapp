@@ -8,9 +8,9 @@ pub mod error;
 pub mod types;
 
 pub struct BabibappClient {
-    base_url: String,
+    pub base_url: String,
+    pub token: String,
     http: HttpClient,
-    token: String,
 }
 
 impl BabibappClient {
@@ -38,6 +38,37 @@ impl BabibappClient {
             base_url: base_url.to_string(),
             http,
             token,
+        })
+    }
+
+    pub async fn with_token(
+        base_url: &str,
+        token: &str,
+    ) -> Result<BabibappClient, BabibappApiError> {
+        let http = HttpClient::new();
+
+        let token = TokenWrapper {
+            token: token.to_string(),
+        };
+
+        let response = http
+            .post(format!("{}/token/validate", base_url))
+            .json(&token)
+            .send()
+            .await?
+            .text()
+            .await?;
+
+        if response != "Valid token" {
+            return Err(BabibappApiError {
+                error: "Invalid token".to_string(),
+            });
+        }
+
+        Ok(BabibappClient {
+            base_url: base_url.to_string(),
+            http,
+            token: token.token,
         })
     }
 
