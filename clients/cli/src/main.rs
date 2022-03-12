@@ -63,6 +63,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "reset_student".to_string(),
         "delete_student".to_string(),
         "make_student_admin".to_string(),
+        "get_teacher".to_string(),
+        "get_all_teachers".to_string(),
         "clear".to_string(),
         "help".to_string(),
         "exit".to_string(),
@@ -544,6 +546,57 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                     println!("Student successfully deleted!");
                     babicli::view_student(&StudentView::Full(student));
+                }
+
+                Some("get_teacher") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher id");
+                            continue;
+                        }
+                    };
+
+                    let teacher = match babibapp.get_teacher(id).await {
+                        Ok(teacher) => teacher,
+                        Err(_) => {
+                            eprintln!("Failed to get teacher");
+                            continue;
+                        }
+                    };
+
+                    babicli::view_teacher(&teacher);
+                }
+
+                Some("get_all_teachers") => {
+                    let teachers = match babibapp.get_all_teachers().await {
+                        Ok(teachers) => teachers,
+                        Err(_) => {
+                            eprintln!("Failed to get all teachers");
+                            continue;
+                        }
+                    };
+
+                    if teachers.is_empty() {
+                        println!("No teachers found");
+                        continue;
+                    }
+
+                    for teacher in &teachers {
+                        babicli::view_teacher(teacher);
+                        println!();
+                    }
                 }
 
                 Some("clear") => print!("\x1B[2J\x1B[1;1H"),

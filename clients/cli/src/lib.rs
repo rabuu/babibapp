@@ -73,8 +73,14 @@ pub fn view_student(student: &StudentView) {
             }
             println!("----------------");
             println!("id: {}", student.id);
-            println!("email: {}", student.email);
-            println!("password hash: {}", student.password_hash);
+            println!("Email: {}", student.email);
+            println!("Password hash: {}", student.password_hash);
         }
     }
+}
+
+pub fn view_teacher(teacher: &Teacher) {
+    println!("{} {}", teacher.prefix, teacher.name);
+    println!("----------------");
+    println!("id: {}", teacher.id);
 }
