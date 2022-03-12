@@ -62,6 +62,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "register_student".to_string(),
         "reset_student".to_string(),
         "delete_student".to_string(),
+        "make_student_admin".to_string(),
         "clear".to_string(),
         "help".to_string(),
         "exit".to_string(),
@@ -478,6 +479,38 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     };
 
                     println!("Student successfully reset!");
+                    babicli::view_student(&StudentView::Full(student));
+                }
+
+                Some("make_student_admin") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid student id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid student id");
+                            continue;
+                        }
+                    };
+
+                    let student = match babibapp.make_student_admin(id).await {
+                        Ok(student) => student,
+                        Err(_) => {
+                            eprintln!("Failed to make student admin");
+                            continue;
+                        }
+                    };
+
+                    println!("Student successfully made admin!");
                     babicli::view_student(&StudentView::Full(student));
                 }
 
