@@ -12,9 +12,14 @@ use babicli::{BabicliCompletion, BabicliHistory};
 #[derive(Parser)]
 #[clap(author, about = "Command line interface for babibapp")]
 struct Cli {
+    #[clap(help = "Pass the API base URL of the babibapp server")]
     base_url: String,
 
-    #[clap(short, long)]
+    #[clap(
+        short,
+        long,
+        help = "Do not authenticate using a token and force to login"
+    )]
     login: bool,
 }
 
