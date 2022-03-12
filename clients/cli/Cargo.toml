@@ -9,3 +9,5 @@ edition = "2021"
 babibapp_api = { path = "../../apis/rust-api" }
 tokio = { version = "1", features = ["full"] }
 dialoguer = { version = "0.10", features = ["history", "password", "completion"] }
+clap = { version = "3.1", features = ["derive"] }
+xdg = "2.4"

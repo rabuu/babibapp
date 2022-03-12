@@ -1,53 +1,101 @@
-use std::{env, process};
+use std::fs;
+use std::io::Write;
+use std::process;
 
+use clap::Parser;
 use dialoguer::theme::{ColorfulTheme, SimpleTheme};
 
 use babibapp_api::types::*;
 use babibapp_api::BabibappClient;
 use babicli::{BabicliCompletion, BabicliHistory};
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut args = env::args().skip(1);
-    let base_url = args.next().unwrap_or_else(|| {
-        eprintln!("Please pass the base url to the babibapp server API");
-        process::exit(1);
-    });
+#[derive(Parser)]
+#[clap(author, about = "Command line interface for babibapp")]
+struct Cli {
+    base_url: String,
 
-    // get credentials
-    let cred_theme = ColorfulTheme::default();
+    #[clap(short, long)]
+    login: bool,
+}
 
-    let email: String = dialoguer::Input::with_theme(&cred_theme)
-        .with_prompt("Your email")
-        .validate_with({
-            let mut force = None;
-            move |input: &String| -> Result<(), &str> {
-                if input.contains('@') || force.as_ref().map_or(false, |old| old == input) {
-                    Ok(())
-                } else {
-                    force = Some(input.clone());
-                    Err("This is not a mail address; type the same value again to force use")
+async fn init_babibapp_client(cli: &Cli) -> Result<BabibappClient, Box<dyn std::error::Error>> {
+    let mut client: Option<BabibappClient> = None;
+
+    let xdg_dirs = xdg::BaseDirectories::with_prefix("babibapp")?;
+
+    if !cli.login {
+        // try to create client with token from XDG_DATA_HOME/token
+        if let Some(token_file) = xdg_dirs.find_data_file("token") {
+            if let Ok(token) = fs::read_to_string(token_file) {
+                if let Ok(babibapp) = BabibappClient::with_token(&cli.base_url, token.trim()).await
+                {
+                    client = Some(babibapp);
                 }
             }
-        })
-        .interact_text()
-        .unwrap();
+        }
+    }
 
-    let password = dialoguer::Password::with_theme(&cred_theme)
-        .with_prompt("Password")
-        .interact()
-        .unwrap();
+    // if token authentication failed, create client by logging in
+    while client.is_none() {
+        // get credentials
+        let cred_theme = ColorfulTheme::default();
 
-    // init client
-    let babibapp = BabibappClient::login(&base_url, &email, &password)
-        .await
-        .unwrap_or_else(|_| {
-            eprintln!("Failed to login");
-            process::exit(1);
-        });
+        let email: String = dialoguer::Input::with_theme(&cred_theme)
+            .with_prompt("Your email")
+            .validate_with({
+                let mut force = None;
+                move |input: &String| -> Result<(), &str> {
+                    if input.contains('@') || force.as_ref().map_or(false, |old| old == input) {
+                        Ok(())
+                    } else {
+                        force = Some(input.clone());
+                        Err("This is not a mail address; type the same value again to force use")
+                    }
+                }
+            })
+            .interact_text()
+            .unwrap();
+
+        let password = dialoguer::Password::with_theme(&cred_theme)
+            .with_prompt("Password")
+            .interact()
+            .unwrap();
+
+        // init client
+        client = match BabibappClient::login(&cli.base_url, &email, &password).await {
+            Ok(client) => Some(client),
+            Err(_) => {
+                eprintln!("Failed to login");
+                continue;
+            }
+        };
+    }
+
+    let client = client.unwrap();
+
+    // write token to XDG_DATA_HOME/token
+    let token = &client.token;
+
+    let token_file_path = if let Some(path) = xdg_dirs.find_data_file("token") {
+        path
+    } else {
+        xdg_dirs.place_data_file("token")?
+    };
+
+    let mut file = fs::File::create(token_file_path)?;
+    file.write(token.as_bytes())?;
+
+    Ok(client)
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let cli = Cli::parse();
+
+    let babibapp = init_babibapp_client(&cli).await?;
 
     println!();
-    println!("Successfully connected to {}!", base_url);
+    println!("Successfully connected to {}!", cli.base_url);
     println!();
     println!("Use `exit` to quit the program or ask for `help`.");
     println!("Use the Up/Down arrows to scroll through history.");
