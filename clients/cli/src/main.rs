@@ -65,6 +65,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "make_student_admin".to_string(),
         "get_teacher".to_string(),
         "get_all_teachers".to_string(),
+        "add_teacher".to_string(),
+        "reset_teacher".to_string(),
+        "delete_teacher".to_string(),
         "clear".to_string(),
         "help".to_string(),
         "exit".to_string(),
@@ -597,6 +600,127 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         babicli::view_teacher(teacher);
                         println!();
                     }
+                }
+
+                Some("add_teacher") => {
+                    let name: String = match dialoguer::Input::with_theme(&info_theme)
+                        .with_prompt("Name")
+                        .interact_text()
+                    {
+                        Ok(name) => name,
+                        Err(_) => {
+                            eprintln!("Failed to read teacher name");
+                            continue;
+                        }
+                    };
+
+                    let prefix: String = match dialoguer::Input::with_theme(&info_theme)
+                        .with_prompt("Prefix")
+                        .interact_text()
+                    {
+                        Ok(prefix) => prefix,
+                        Err(_) => {
+                            eprintln!("Failed to read teacher prefix");
+                            continue;
+                        }
+                    };
+
+                    let teacher = match babibapp.add_teacher(&name, &prefix).await {
+                        Ok(teacher) => teacher,
+                        Err(_) => {
+                            eprintln!("Failed to add teacher");
+                            continue;
+                        }
+                    };
+
+                    println!("Teacher successfully added!");
+                    babicli::view_teacher(&teacher);
+                }
+
+                Some("reset_teacher") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher id");
+                            continue;
+                        }
+                    };
+
+                    let name: String = match dialoguer::Input::with_theme(&info_theme)
+                        .with_prompt("Name")
+                        .interact_text()
+                    {
+                        Ok(name) => name,
+                        Err(_) => {
+                            eprintln!("Failed to read teacher name");
+                            continue;
+                        }
+                    };
+
+                    let prefix: String = match dialoguer::Input::with_theme(&info_theme)
+                        .with_prompt("Prefix")
+                        .interact_text()
+                    {
+                        Ok(prefix) => prefix,
+                        Err(_) => {
+                            eprintln!("Failed to read teacher prefix");
+                            continue;
+                        }
+                    };
+
+                    let teacher = match babibapp.reset_teacher(id, &name, &prefix).await {
+                        Ok(teacher) => teacher,
+                        Err(_) => {
+                            eprintln!("Failed to reset teacher");
+                            continue;
+                        }
+                    };
+
+                    println!("Teacher successfully reset!");
+                    babicli::view_teacher(&teacher);
+                }
+
+                Some("delete_teacher") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher id");
+                            continue;
+                        }
+                    };
+
+                    let teacher = match babibapp.delete_teacher(id).await {
+                        Ok(teacher) => teacher,
+                        Err(_) => {
+                            eprintln!("Failed to delete teacher");
+                            continue;
+                        }
+                    };
+
+                    println!("Teacher successfully deleted!");
+                    babicli::view_teacher(&teacher);
                 }
 
                 Some("clear") => print!("\x1B[2J\x1B[1;1H"),
