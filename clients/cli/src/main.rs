@@ -109,15 +109,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut history = BabicliHistory::default();
     let completion = BabicliCompletion::new(&vec![
         "validate_token",
-        "get_student",
-        "get_self",
-        "get_all_students",
+        "show_student",
+        "show_self",
+        "show_all_students",
         "register_student",
         "reset_student",
         "delete_student",
         "make_student_admin",
-        "get_teacher",
-        "get_all_teachers",
+        "show_teacher",
+        "show_all_teachers",
         "add_teacher",
         "reset_teacher",
         "delete_teacher",
@@ -159,7 +159,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
 
-                Some("get_student") => {
+                Some("show_student") => {
                     let id = if let Some(id) = args.next() {
                         if let Ok(id) = id.parse::<i32>() {
                             id
@@ -190,7 +190,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     babicli::view_student(&student);
                 }
 
-                Some("get_self") => {
+                Some("show_self") => {
                     let me = match babibapp.get_self().await {
                         Ok(me) => me,
                         Err(_) => {
@@ -202,7 +202,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     babicli::view_student(&StudentView::Full(me));
                 }
 
-                Some("get_all_students") => {
+                Some("show_all_students") => {
                     let students = match babibapp.get_all_students().await {
                         Ok(students) => students,
                         Err(_) => {
@@ -606,7 +606,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     babicli::view_student(&StudentView::Full(student));
                 }
 
-                Some("get_teacher") => {
+                Some("show_teacher") => {
                     let id = if let Some(id) = args.next() {
                         if let Ok(id) = id.parse::<i32>() {
                             id
@@ -637,7 +637,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     babicli::view_teacher(&teacher);
                 }
 
-                Some("get_all_teachers") => {
+                Some("show_all_teachers") => {
                     let teachers = match babibapp.get_all_teachers().await {
                         Ok(teachers) => teachers,
                         Err(_) => {
