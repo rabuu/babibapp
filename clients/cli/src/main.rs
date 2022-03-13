@@ -102,7 +102,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!();
     println!("Successfully connected to {}!", cli.base_url);
     println!();
-    println!("Use `exit` to quit the program or ask for `help`.");
+    println!("Use `exit` or `quit` to quit the program.");
     println!("Use the Up/Down arrows to scroll through history.");
     println!("Use the Right arrow or Tab to complete your command.");
 
