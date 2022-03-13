@@ -124,6 +124,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "show_student_comment",
         "show_all_student_comments",
         "create_student_comment",
+        "upvote_student_comment",
+        "downvote_student_comment",
+        "unvote_student_comment",
         "clear",
         "help",
         "exit",
@@ -986,6 +989,90 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         &StudentView::Full(author),
                         0,
                     );
+                }
+
+                Some("upvote_student_comment") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    };
+
+                    if babibapp.upvote_student_comment(id).await.is_err() {
+                        eprintln!("Failed to upvote student comment");
+                        continue;
+                    }
+
+                    println!("Student comment successfully upvoted!");
+                }
+
+                Some("downvote_student_comment") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    };
+
+                    if babibapp.downvote_student_comment(id).await.is_err() {
+                        eprintln!("Failed to downvote student comment");
+                        continue;
+                    }
+
+                    println!("Student comment successfully downvoted!");
+                }
+
+                Some("unvote_student_comment") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    };
+
+                    if babibapp.unvote_student_comment(id).await.is_err() {
+                        eprintln!("Failed to unvote student comment");
+                        continue;
+                    }
+
+                    println!("Student comment successfully unvoted!");
                 }
 
                 Some("clear") => print!("\x1B[2J\x1B[1;1H"),
