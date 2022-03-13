@@ -127,6 +127,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "upvote_student_comment",
         "downvote_student_comment",
         "unvote_student_comment",
+        "delete_student_comment",
         "clear",
         "help",
         "exit",
@@ -1073,6 +1074,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
 
                     println!("Student comment successfully unvoted!");
+                }
+
+                Some("delete_student_comment") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    };
+
+                    let _ = match babibapp.delete_student_comment(id).await {
+                        Ok(comment) => comment,
+                        Err(_) => {
+                            eprintln!("Failed to delete student comment");
+                            continue;
+                        }
+                    };
+
+                    println!("Student comment successfully deleted!");
                 }
 
                 Some("clear") => print!("\x1B[2J\x1B[1;1H"),
