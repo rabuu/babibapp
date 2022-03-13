@@ -120,16 +120,15 @@ pub fn view_student_comment_limited(
 
     let published: DateTime<Local> = comment.published.into();
 
-    println!(
-        "-> {} {} [{}]",
-        recv_name.0,
-        recv_name.1,
-        published.format("%d.%m.%Y %T")
-    );
+    println!("-> {} {} [{}]", recv_name.0, recv_name.1, comment.id,);
     println!("----------------");
     println!("{}", comment.body);
     println!("----------------");
-    println!("Vote: {}", vote);
+    println!(
+        "Vote: {}, published: {}",
+        vote,
+        published.format("%d.%m.%Y %T")
+    );
 }
 
 pub fn view_student_comment_full(
@@ -152,14 +151,14 @@ pub fn view_student_comment_full(
 
     println!(
         "{} {} -> {} {} [{}]",
-        author_name.0,
-        author_name.1,
-        recv_name.0,
-        recv_name.1,
-        published.format("%d.%m.%Y %T")
+        author_name.0, author_name.1, recv_name.0, recv_name.1, comment.id,
     );
     println!("----------------");
     println!("{}", comment.body);
     println!("----------------");
-    println!("Vote: {}", vote);
+    println!(
+        "Vote: {}, published: {}",
+        vote,
+        published.format("%d.%m.%Y %T")
+    );
 }
