@@ -465,7 +465,7 @@ impl BabibappClient {
 
     pub async fn unvote_student_comment(&self, comment_id: i32) -> Result<(), BabibappApiError> {
         self.http
-            .post(format!(
+            .delete(format!(
                 "{}/comment/student/unvote/{}",
                 self.base_url, comment_id
             ))
@@ -589,7 +589,7 @@ impl BabibappClient {
 
     pub async fn unvote_teacher_comment(&self, comment_id: i32) -> Result<(), BabibappApiError> {
         self.http
-            .post(format!(
+            .delete(format!(
                 "{}/comment/teacher/unvote/{}",
                 self.base_url, comment_id
             ))
