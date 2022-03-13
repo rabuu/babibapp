@@ -128,6 +128,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "downvote_student_comment",
         "unvote_student_comment",
         "delete_student_comment",
+        "show_teacher_comment",
+        "show_all_teacher_comments",
+        "create_teacher_comment",
+        "upvote_teacher_comment",
+        "downvote_teacher_comment",
+        "unvote_teacher_comment",
+        "delete_teacher_comment",
         "clear",
         "help",
         "exit",
@@ -1107,9 +1114,331 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("Student comment successfully deleted!");
                 }
 
-                Some("clear") => print!("\x1B[2J\x1B[1;1H"),
+                Some("show_teacher_comment") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    };
 
-                Some("help") => println!("`help` is not yet implemented"),
+                    let comment = match babibapp.get_teacher_comment(id).await {
+                        Ok(comment) => comment,
+                        Err(_) => {
+                            eprintln!("Failed to get teacher comment");
+                            continue;
+                        }
+                    };
+
+                    let vote = match babibapp.get_teacher_comment_vote(id).await {
+                        Ok(vote) => vote,
+                        Err(_) => {
+                            eprintln!("Failed to get teacher comment vote");
+                            continue;
+                        }
+                    };
+
+                    match comment {
+                        TeacherCommentView::Limited(comment) => {
+                            let receiver = match babibapp.get_teacher(comment.receiver_id).await {
+                                Ok(teacher) => teacher,
+                                Err(_) => {
+                                    eprintln!("Failed to get receiver teacher");
+                                    continue;
+                                }
+                            };
+
+                            babicli::view_teacher_comment_limited(&comment, &receiver, vote);
+                        }
+                        TeacherCommentView::Full(comment) => {
+                            let receiver = match babibapp.get_teacher(comment.receiver_id).await {
+                                Ok(teacher) => teacher,
+                                Err(_) => {
+                                    eprintln!("Failed to get receiver teacher");
+                                    continue;
+                                }
+                            };
+
+                            let author = match babibapp.get_student(comment.author_id).await {
+                                Ok(teacher) => teacher,
+                                Err(_) => {
+                                    eprintln!("Failed to get author");
+                                    continue;
+                                }
+                            };
+
+                            babicli::view_teacher_comment_full(&comment, &receiver, &author, vote);
+                        }
+                    }
+                }
+
+                Some("show_all_teacher_comments") => {
+                    let comments = match babibapp.get_all_teacher_comments().await {
+                        Ok(comments) => comments,
+                        Err(_) => {
+                            eprintln!("Failed to get all teacher comments");
+                            continue;
+                        }
+                    };
+
+                    if comments.is_empty() {
+                        println!("No teacher comments found!");
+                        continue;
+                    }
+
+                    for comment in &comments {
+                        match comment {
+                            TeacherCommentView::Limited(comment) => {
+                                let vote = match babibapp.get_teacher_comment_vote(comment.id).await
+                                {
+                                    Ok(vote) => vote,
+                                    Err(_) => {
+                                        eprintln!("Failed to get teacher comment vote");
+                                        continue;
+                                    }
+                                };
+
+                                let receiver = match babibapp.get_teacher(comment.receiver_id).await
+                                {
+                                    Ok(teacher) => teacher,
+                                    Err(_) => {
+                                        eprintln!("Failed to get receiver teacher");
+                                        continue;
+                                    }
+                                };
+
+                                babicli::view_teacher_comment_limited(&comment, &receiver, vote);
+                            }
+                            TeacherCommentView::Full(comment) => {
+                                let vote = match babibapp.get_teacher_comment_vote(comment.id).await
+                                {
+                                    Ok(vote) => vote,
+                                    Err(_) => {
+                                        eprintln!("Failed to get teacher comment vote");
+                                        continue;
+                                    }
+                                };
+
+                                let receiver = match babibapp.get_teacher(comment.receiver_id).await
+                                {
+                                    Ok(teacher) => teacher,
+                                    Err(_) => {
+                                        eprintln!("Failed to get receiver teacher");
+                                        continue;
+                                    }
+                                };
+
+                                let author = match babibapp.get_student(comment.author_id).await {
+                                    Ok(teacher) => teacher,
+                                    Err(_) => {
+                                        eprintln!("Failed to get author");
+                                        continue;
+                                    }
+                                };
+
+                                babicli::view_teacher_comment_full(
+                                    &comment, &receiver, &author, vote,
+                                );
+                            }
+                        }
+                        println!();
+                    }
+                }
+
+                Some("create_teacher_comment") => {
+                    let recv_id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("Receiver id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    };
+
+                    let body = match dialoguer::Editor::new().edit("Enter your comment") {
+                        Ok(Some(body)) => body,
+                        _ => {
+                            eprintln!("Abort!");
+                            continue;
+                        }
+                    };
+
+                    if body.trim().is_empty() {
+                        eprintln!("Empty comment, abort!");
+                        continue;
+                    }
+
+                    let comment = match babibapp.create_teacher_comment(recv_id, &body).await {
+                        Ok(comment) => comment,
+                        Err(_) => {
+                            eprintln!("Failed to create teacher comment");
+                            continue;
+                        }
+                    };
+
+                    let receiver = match babibapp.get_teacher(recv_id).await {
+                        Ok(recv) => recv,
+                        Err(_) => {
+                            eprintln!("Failed to get receiver");
+                            continue;
+                        }
+                    };
+
+                    let author = match babibapp.get_self().await {
+                        Ok(author) => author,
+                        Err(_) => {
+                            eprintln!("Failed to get self");
+                            continue;
+                        }
+                    };
+
+                    println!("Teacher comment successfully created!");
+                    babicli::view_teacher_comment_full(
+                        &comment,
+                        &receiver,
+                        &StudentView::Full(author),
+                        0,
+                    );
+                }
+
+                Some("upvote_teacher_comment") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    };
+
+                    if babibapp.upvote_teacher_comment(id).await.is_err() {
+                        eprintln!("Failed to upvote teacher comment");
+                        continue;
+                    }
+
+                    println!("Teacher comment successfully upvoted!");
+                }
+
+                Some("downvote_teacher_comment") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    };
+
+                    if babibapp.downvote_teacher_comment(id).await.is_err() {
+                        eprintln!("Failed to downvote teacher comment");
+                        continue;
+                    }
+
+                    println!("Teacher comment successfully downvoted!");
+                }
+
+                Some("unvote_teacher_comment") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    };
+
+                    if babibapp.unvote_teacher_comment(id).await.is_err() {
+                        eprintln!("Failed to unvote teacher comment");
+                        continue;
+                    }
+
+                    println!("Teacher comment successfully unvoted!");
+                }
+
+                Some("delete_teacher_comment") => {
+                    let id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid teacher comment id");
+                            continue;
+                        }
+                    };
+
+                    let _ = match babibapp.delete_teacher_comment(id).await {
+                        Ok(comment) => comment,
+                        Err(_) => {
+                            eprintln!("Failed to delete teacher comment");
+                            continue;
+                        }
+                    };
+
+                    println!("Teacher comment successfully deleted!");
+                }
+
+                Some("clear") => print!("\x1B[2J\x1B[1;1H"),
 
                 Some("exit") | Some("quit") => {
                     println!("Exit.");

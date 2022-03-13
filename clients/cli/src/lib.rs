@@ -162,3 +162,48 @@ pub fn view_student_comment_full(
         published.format("%d.%m.%Y %T")
     );
 }
+
+pub fn view_teacher_comment_limited(
+    comment: &LimitedViewTeacherComment,
+    recv: &Teacher,
+    vote: i64,
+) {
+    let published: DateTime<Local> = comment.published.into();
+
+    println!("-> {} {} [{}]", recv.prefix, recv.name, comment.id,);
+    println!("----------------");
+    println!("{}", comment.body);
+    println!("----------------");
+    println!(
+        "Vote: {}, published: {}",
+        vote,
+        published.format("%d.%m.%Y %T")
+    );
+}
+
+pub fn view_teacher_comment_full(
+    comment: &TeacherComment,
+    recv: &Teacher,
+    author: &StudentView,
+    vote: i64,
+) {
+    let author_name = match author {
+        StudentView::Limited(teacher) => (&teacher.first_name, &teacher.last_name),
+        StudentView::Full(teacher) => (&teacher.first_name, &teacher.last_name),
+    };
+
+    let published: DateTime<Local> = comment.published.into();
+
+    println!(
+        "{} {} -> {} {} [{}]",
+        author_name.0, author_name.1, recv.prefix, recv.name, comment.id,
+    );
+    println!("----------------");
+    println!("{}", comment.body);
+    println!("----------------");
+    println!(
+        "Vote: {}, published: {}",
+        vote,
+        published.format("%d.%m.%Y %T")
+    );
+}
