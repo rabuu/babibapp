@@ -23,20 +23,16 @@ rust-musl-builder cargo build --release
 
 See [emk/rust-musl-builder](https://github.com/emk/rust-musl-builder).
 
-## TODO
+## what's implemented
 
 - [server](server)
 	- features:
-		- students (X)
-		- teachers (X)
-		- comments (X)
-			- plus votes (X)
-		- (quotes)
-		- (rankings)
-	- user authentication (X)
+		- students
+		- teachers
+		- comments
+			- with votes
+	- JWT user authentication
 - [APIs](apis)
-	- [Rust API](apis/rust-api) (X)
-	- (JavaScript/TypeScript API)
+	- [Rust API](apis/rust-api)
 - [clients](clients)
 	- [Command line interface](clients/cli)
-	- (Web UI)
