@@ -53,11 +53,32 @@ impl Completion for BabicliCompletion {
             .filter(|opt| opt.starts_with(input))
             .collect::<Vec<_>>();
 
-        if matches.len() == 1 {
-            Some(matches[0].to_string())
-        } else {
-            None
+        if matches.is_empty() {
+            return None;
+        } else if matches.len() == 1 {
+            return Some(matches[0].to_string());
         }
+
+        let mut completion = String::new();
+        'outer: for (i, c) in matches[0].chars().enumerate() {
+            for word in &matches {
+                let wc = match word.chars().nth(i) {
+                    Some(wc) => wc,
+                    None => break 'outer,
+                };
+
+                if wc != c {
+                    break 'outer;
+                }
+            }
+            completion.push(c);
+        }
+
+        if completion.is_empty() {
+            return None;
+        }
+
+        Some(completion)
     }
 }
 
