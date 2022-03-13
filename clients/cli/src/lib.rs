@@ -100,7 +100,7 @@ pub fn view_student_comment_limited(
     let published: DateTime<Local> = comment.published.into();
 
     println!(
-        "TO {} {} [{}]",
+        "-> {} {} [{}]",
         recv_name.0,
         recv_name.1,
         published.format("%d.%m.%Y %T")
@@ -130,7 +130,7 @@ pub fn view_student_comment_full(
     let published: DateTime<Local> = comment.published.into();
 
     println!(
-        "{} {} TO {} {} [{}]",
+        "{} {} -> {} {} [{}]",
         author_name.0,
         author_name.1,
         recv_name.0,

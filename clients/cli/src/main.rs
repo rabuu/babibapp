@@ -123,6 +123,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "delete_teacher",
         "show_student_comment",
         "show_all_student_comments",
+        "create_student_comment",
         "clear",
         "help",
         "exit",
@@ -917,7 +918,74 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 );
                             }
                         }
+                        println!();
                     }
+                }
+
+                Some("create_student_comment") => {
+                    let recv_id = if let Some(id) = args.next() {
+                        if let Ok(id) = id.parse::<i32>() {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    } else {
+                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                            .with_prompt("Receiver id")
+                            .interact_text()
+                        {
+                            id
+                        } else {
+                            eprintln!("Invalid student comment id");
+                            continue;
+                        }
+                    };
+
+                    let body = match dialoguer::Editor::new().edit("Enter your comment") {
+                        Ok(Some(body)) => body,
+                        _ => {
+                            eprintln!("Abort!");
+                            continue;
+                        }
+                    };
+
+                    if body.trim().is_empty() {
+                        eprintln!("Empty comment, abort!");
+                        continue;
+                    }
+
+                    let comment = match babibapp.create_student_comment(recv_id, &body).await {
+                        Ok(comment) => comment,
+                        Err(_) => {
+                            eprintln!("Failed to create student comment");
+                            continue;
+                        }
+                    };
+
+                    let receiver = match babibapp.get_student(recv_id).await {
+                        Ok(recv) => recv,
+                        Err(_) => {
+                            eprintln!("Failed to get receiver");
+                            continue;
+                        }
+                    };
+
+                    let author = match babibapp.get_self().await {
+                        Ok(author) => author,
+                        Err(_) => {
+                            eprintln!("Failed to get self");
+                            continue;
+                        }
+                    };
+
+                    println!("Student comment successfully created!");
+                    babicli::view_student_comment_full(
+                        &comment,
+                        &receiver,
+                        &StudentView::Full(author),
+                        0,
+                    );
                 }
 
                 Some("clear") => print!("\x1B[2J\x1B[1;1H"),
