@@ -106,8 +106,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Use the Up/Down arrows to scroll through history.");
     println!("Use the Right arrow or Tab to complete your command.");
 
-    let mut history = BabicliHistory::default();
-    let completion = BabicliCompletion::new(&vec![
+    let commands = vec![
         "validate_token",
         "show_student",
         "show_self",
@@ -139,7 +138,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "help",
         "exit",
         "quit",
-    ]);
+    ];
+
+    let completion = BabicliCompletion::new(&commands);
+    let mut history = BabicliHistory::default();
 
     loop {
         println!();
@@ -149,8 +151,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         if let Ok(cmd) = dialoguer::Input::<String>::with_theme(&cmd_theme)
             .with_prompt("babicli")
-            .history_with(&mut history)
             .completion_with(&completion)
+            .history_with(&mut history)
             .interact_text()
         {
             let mut args = cmd.split_whitespace();
@@ -1436,6 +1438,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     };
 
                     println!("Teacher comment successfully deleted!");
+                }
+
+                Some("help") => {
+                    println!("Available commands:\n");
+                    for cmd in &commands {
+                        println!("{}", cmd);
+                    }
                 }
 
                 Some("clear") => print!("\x1B[2J\x1B[1;1H"),
