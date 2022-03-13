@@ -88,7 +88,7 @@ async fn init_babibapp_client(cli: &Cli) -> Result<BabibappClient, Box<dyn std::
     };
 
     let mut file = fs::File::create(token_file_path)?;
-    file.write(token.as_bytes())?;
+    file.write_all(token.as_bytes())?;
 
     Ok(client)
 }
