@@ -181,16 +181,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid student id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid student id");
-                            continue;
-                        }
+                        eprintln!("Invalid student id");
+                        continue;
                     };
 
                     let student = match babibapp.get_student(id).await {
@@ -327,16 +325,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid student id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid student id");
-                            continue;
-                        }
+                        eprintln!("Invalid student id");
+                        continue;
                     };
 
                     let reset_options = &["Email", "Password", "Name", "Full"];
@@ -564,16 +560,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid student id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid student id");
-                            continue;
-                        }
+                        eprintln!("Invalid student id");
+                        continue;
                     };
 
                     let student = match babibapp.make_student_admin(id).await {
@@ -596,16 +590,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid student id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid student id");
-                            continue;
-                        }
+                        eprintln!("Invalid student id");
+                        continue;
                     };
 
                     let student = match babibapp.delete_student(id).await {
@@ -628,16 +620,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid teacher id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid teacher id");
-                            continue;
-                        }
+                        eprintln!("Invalid teacher id");
+                        continue;
                     };
 
                     let teacher = match babibapp.get_teacher(id).await {
@@ -714,16 +704,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid teacher id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid teacher id");
-                            continue;
-                        }
+                        eprintln!("Invalid teacher id");
+                        continue;
                     };
 
                     let name: String = match dialoguer::Input::with_theme(&info_theme)
@@ -768,16 +756,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid teacher id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid teacher id");
-                            continue;
-                        }
+                        eprintln!("Invalid teacher id");
+                        continue;
                     };
 
                     let teacher = match babibapp.delete_teacher(id).await {
@@ -800,16 +786,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid student comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid student comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid student comment id");
+                        continue;
                     };
 
                     let comment = match babibapp.get_student_comment(id).await {
@@ -897,7 +881,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     }
                                 };
 
-                                babicli::view_student_comment_limited(&comment, &receiver, vote);
+                                babicli::view_student_comment_limited(comment, &receiver, vote);
                             }
                             StudentCommentView::Full(comment) => {
                                 let vote = match babibapp.get_student_comment_vote(comment.id).await
@@ -927,7 +911,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 };
 
                                 babicli::view_student_comment_full(
-                                    &comment, &receiver, &author, vote,
+                                    comment, &receiver, &author, vote,
                                 );
                             }
                         }
@@ -943,16 +927,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid student comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("Receiver id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("Receiver id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid student comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid student comment id");
+                        continue;
                     };
 
                     let body = match dialoguer::Editor::new().edit("Enter your comment") {
@@ -1009,16 +991,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid student comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid student comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid student comment id");
+                        continue;
                     };
 
                     if babibapp.upvote_student_comment(id).await.is_err() {
@@ -1037,16 +1017,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid student comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid student comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid student comment id");
+                        continue;
                     };
 
                     if babibapp.downvote_student_comment(id).await.is_err() {
@@ -1065,16 +1043,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid student comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid student comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid student comment id");
+                        continue;
                     };
 
                     if babibapp.unvote_student_comment(id).await.is_err() {
@@ -1093,16 +1069,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid student comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid student comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid student comment id");
+                        continue;
                     };
 
                     let _ = match babibapp.delete_student_comment(id).await {
@@ -1124,16 +1098,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid teacher comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid teacher comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid teacher comment id");
+                        continue;
                     };
 
                     let comment = match babibapp.get_teacher_comment(id).await {
@@ -1221,7 +1193,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     }
                                 };
 
-                                babicli::view_teacher_comment_limited(&comment, &receiver, vote);
+                                babicli::view_teacher_comment_limited(comment, &receiver, vote);
                             }
                             TeacherCommentView::Full(comment) => {
                                 let vote = match babibapp.get_teacher_comment_vote(comment.id).await
@@ -1251,7 +1223,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 };
 
                                 babicli::view_teacher_comment_full(
-                                    &comment, &receiver, &author, vote,
+                                    comment, &receiver, &author, vote,
                                 );
                             }
                         }
@@ -1267,16 +1239,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid teacher comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("Receiver id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("Receiver id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid teacher comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid teacher comment id");
+                        continue;
                     };
 
                     let body = match dialoguer::Editor::new().edit("Enter your comment") {
@@ -1333,16 +1303,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid teacher comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid teacher comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid teacher comment id");
+                        continue;
                     };
 
                     if babibapp.upvote_teacher_comment(id).await.is_err() {
@@ -1361,16 +1329,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid teacher comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid teacher comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid teacher comment id");
+                        continue;
                     };
 
                     if babibapp.downvote_teacher_comment(id).await.is_err() {
@@ -1389,16 +1355,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid teacher comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid teacher comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid teacher comment id");
+                        continue;
                     };
 
                     if babibapp.unvote_teacher_comment(id).await.is_err() {
@@ -1417,16 +1381,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Invalid teacher comment id");
                             continue;
                         }
+                    } else if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
+                        .with_prompt("id")
+                        .interact_text()
+                    {
+                        id
                     } else {
-                        if let Ok(id) = dialoguer::Input::<i32>::with_theme(&info_theme)
-                            .with_prompt("id")
-                            .interact_text()
-                        {
-                            id
-                        } else {
-                            eprintln!("Invalid teacher comment id");
-                            continue;
-                        }
+                        eprintln!("Invalid teacher comment id");
+                        continue;
                     };
 
                     let _ = match babibapp.delete_teacher_comment(id).await {
